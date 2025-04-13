@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Flow - Image Description</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Art Flow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/image-description">Image Description</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/text-to-image">Text to Image</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/image-inspired">Image Inspired Art</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="card p-4">
+            <h1>Image Description Generator</h1>
+            <p>Upload an image to receive a detailed description.</p>
+            <form id="imageDescriptionForm">
+                <div class="mb-3">
+                    <label for="imageFile" class="form-label">Upload Image</label>
+                    <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                </div>
+                <img id="imagePreview" class="mb-3" alt="Image Preview">
+                <button type="submit" class="btn btn-primary btn-wiggle">Generate Description</button>
+            </form>
+            <div class="mt-4">
+                <h3>Description</h3>
+                <pre id="descriptionResult" class="border p-3"></pre>
+                <button id="copyDescription" class="btn btn-primary btn-wiggle mt-2" style="display: none;">Copy
+                    Description</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

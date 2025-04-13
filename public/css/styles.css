@@ -1,0 +1,74 @@
+/* Neobrutalism Base */
+body {
+    background-color: #FFFDD0; /* Cream */
+    font-family: 'Arial', sans-serif;
+    color: #333;
+  }
+  
+  /* Playful Typography */
+  h1, h2, h3 {
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 3px 3px #FFD1DC; /* Pastel pink shadow */
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Neobrutalist Containers */
+  .card {
+    background-color: #AFCBFF; /* Pastel blue */
+    border: 4px solid #333;
+    box-shadow: 8px 8px 0 #FFD1DC;
+    border-radius: 0;
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 #FFD1DC;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    background-color: #FFD1DC;
+    border: 3px solid #333;
+    color: #333;
+    font-weight: bold;
+    border-radius: 0;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background-color: #FF9EAA;
+    transform: scale(1.05);
+  }
+  
+  /* Playful Animations */
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(2deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  .btn-wiggle:hover {
+    animation: wiggle 0.5s infinite;
+  }
+  
+  /* Image Previews */
+  .img-preview {
+    max-width: 100%;
+    border: 3px solid #333;
+    box-shadow: 5px 5px 0 #AFCBFF;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .card {
+      box-shadow: 4px 4px 0 #FFD1DC;
+    }
+    .card:hover {
+      transform: none;
+      box-shadow: 4px 4px 0 #FFD1DC;
+    }
+  }

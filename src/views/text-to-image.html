@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Flow - Text to Image</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Art Flow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/image-description">Image Description</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/text-to-image">Text to Image</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/image-inspired">Image Inspired Art</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="card p-4">
+            <h1>Text to Image Generator</h1>
+            <p>Enter a prompt to create a unique image.</p>
+            <form id="textToImageForm">
+                <div class="mb-3">
+                    <label for="textPrompt" class="form-label">Your Prompt</label>
+                    <textarea class="form-control" id="textPrompt" rows="4" placeholder="e.g., A serene beach at sunset"
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-wiggle">Generate Image</button>
+            </form>
+            <div class="mt-4">
+                <h3>Generated Image</h3>
+                <img id="generatedImage" class="mb-3" alt="Generated Image">
+                <a id="downloadImage" class="btn btn-primary btn-wiggle mt-2" style="display: none;" download>Download
+                    Image</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>
