@@ -11,10 +11,23 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
+// Explicit routes for feature pages
+app.get('/image-description', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/image-description.html'));
+});
+
+app.get('/text-to-image', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/text-to-image.html'));
+});
+
+app.get('/image-inspired', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/image-inspired.html'));
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
-// Fallback to index.html for SPA-like behavior
+// Fallback to index.html for other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
