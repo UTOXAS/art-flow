@@ -5,7 +5,6 @@ const mime = require('mime-types');
 const path = require('path');
 require('dotenv').config();
 
-
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set in environment variables.');
@@ -13,10 +12,25 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
-const model = genAI.getGenerativeModel({
+// Models for different tasks
+const descriptionModel = genAI.getGenerativeModel({
+    model: 'gemini-2.0-flash-lite',
+});
+const generationModel = genAI.getGenerativeModel({
     model: 'gemini-2.0-flash-exp-image-generation',
 });
 
+// Configuration for description tasks
+const descriptionConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 8192,
+    responseModalities: ['text'],
+    responseMimeType: 'text/plain',
+};
+
+// Configuration for image generation tasks
 const generationConfig = {
     temperature: 1,
     topP: 0.95,
@@ -96,7 +110,7 @@ async function uploadToGemini(filePath) {
 async function generateImageDescription(filePath) {
     try {
         const file = await uploadToGemini(filePath);
-        const chatSession = model.startChat({ generationConfig });
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
         const result = await chatSession.sendMessage([
             {
@@ -113,13 +127,14 @@ async function generateImageDescription(filePath) {
         return description;
     } catch (error) {
         console.error('Error generating image description:', error.message, error.stack);
+        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         throw error;
     }
 }
 
 async function generateImageFromText(prompt) {
     try {
-        const chatSession = model.startChat({ generationConfig });
+        const chatSession = generationModel.startChat({ generationConfig });
         const result = await chatSession.sendMessage(prompt);
 
         const filename = `generated-${Date.now()}.png`;
@@ -142,9 +157,10 @@ async function generateImageFromText(prompt) {
 }
 
 async function generateInspiredArt(filePath, additionalInstructions = '') {
+    let tempFilePath = filePath;
     try {
         const file = await uploadToGemini(filePath);
-        const chatSession = model.startChat({ generationConfig });
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
         // Step 1: Generate Description
         let result = await chatSession.sendMessage([
@@ -166,25 +182,27 @@ async function generateInspiredArt(filePath, additionalInstructions = '') {
         const artPrompt = result.response.text().replace(/```/g, '');
 
         // Step 3: Generate Image from Art Prompt
+        const imageSession = generationModel.startChat({ generationConfig });
         const filename = `inspired-${Date.now()}.png`;
         const outputPath = path.join(__dirname, '../../public/uploads', filename);
 
-        result = await chatSession.sendMessage(artPrompt);
+        result = await imageSession.sendMessage(artPrompt);
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
             for (const part of candidate.content.parts) {
                 if (part.inlineData) {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
-                    await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+                    await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
                     return { description, prompt: artPrompt, filename };
                 }
             }
         }
 
-        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
         return { description, prompt: artPrompt };
     } catch (error) {
         console.error('Error generating inspired art:', error.message, error.stack);
+        await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
         throw error;
     }
 }
