@@ -23,6 +23,7 @@ router.post('/image-description', upload.single('image'), async (req, res) => {
         const description = await generateImageDescription(req.file.path);
         res.json({ description });
     } catch (error) {
+        console.error('Error in /image-description:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to generate description.' });
     }
 });
@@ -36,6 +37,7 @@ router.post('/text-to-image', async (req, res) => {
         const filename = await generateImageFromText(prompt);
         res.json({ filename });
     } catch (error) {
+        console.error('Error in /text-to-image:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to generate image.' });
     }
 });
@@ -49,6 +51,7 @@ router.post('/image-inspired', upload.single('image'), async (req, res) => {
         const result = await generateInspiredArt(req.file.path, instructions);
         res.json(result);
     } catch (error) {
+        console.error('Error in /image-inspired:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to generate inspired art.' });
     }
 });

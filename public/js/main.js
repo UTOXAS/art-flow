@@ -54,13 +54,13 @@ function setupImageDescription() {
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(data.error, 'danger');
+                showAlert(`Error: ${data.error}`, 'danger');
             } else {
                 resultDiv.textContent = data.description;
                 copyBtn.style.display = 'block';
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert(`An error occurred: ${err.message}`, 'danger');
         }
     });
 
@@ -94,7 +94,7 @@ function setupTextToImage() {
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(data.error, 'danger');
+                showAlert(`Error: ${data.error}`, 'danger');
             } else {
                 preview.src = `/uploads/${data.filename}`;
                 preview.classList.add('img-preview');
@@ -102,7 +102,7 @@ function setupTextToImage() {
                 downloadBtn.href = preview.src;
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert(`An error occurred: ${err.message}`, 'danger');
         }
     });
 }
@@ -156,7 +156,7 @@ function setupImageInspired() {
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(data.error, 'danger');
+                showAlert(`Error: ${data.error}`, 'danger');
             } else {
                 descriptionDiv.textContent = data.description;
                 promptDiv.textContent = data.prompt;
@@ -170,7 +170,7 @@ function setupImageInspired() {
                 copyPromptBtn.style.display = 'block';
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert(`An error occurred: ${err.message}`, 'danger');
         }
     });
 

@@ -1,10 +1,15 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
-const fs = require('fs');
+const fs = require('fs').promises;
 const mime = require('mime-types');
 const path = require('path');
+require('dotenv').config();
+
 
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not set in environment variables.');
+}
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
@@ -72,93 +77,116 @@ and the prompt should be in a triple backticks block.
 `;
 
 async function uploadToGemini(filePath) {
-    const mimeType = mime.lookup(filePath);
-    const uploadResult = await fileManager.uploadFile(filePath, {
-        mimeType,
-        displayName: path.basename(filePath),
-    });
-    return uploadResult.file;
+    try {
+        const mimeType = mime.lookup(filePath);
+        if (!mimeType) {
+            throw new Error(`Unknown MIME type for file: ${filePath}`);
+        }
+        const uploadResult = await fileManager.uploadFile(filePath, {
+            mimeType,
+            displayName: path.basename(filePath),
+        });
+        return uploadResult.file;
+    } catch (error) {
+        console.error('Error uploading to Gemini:', error.message, error.stack);
+        throw error;
+    }
 }
 
 async function generateImageDescription(filePath) {
-    const file = await uploadToGemini(filePath);
-    const chatSession = model.startChat({ generationConfig });
+    try {
+        const file = await uploadToGemini(filePath);
+        const chatSession = model.startChat({ generationConfig });
 
-    const result = await chatSession.sendMessage([
-        {
-            fileData: {
-                mimeType: file.mimeType,
-                fileUri: file.uri,
+        const result = await chatSession.sendMessage([
+            {
+                fileData: {
+                    mimeType: file.mimeType,
+                    fileUri: file.uri,
+                },
             },
-        },
-        { text: descriptionPrompt },
-    ]);
+            { text: descriptionPrompt },
+        ]);
 
-    const description = result.response.text().replace(/```/g, '');
-    fs.unlinkSync(filePath); // Clean up
-    return description;
+        const description = result.response.text().replace(/```/g, '');
+        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        return description;
+    } catch (error) {
+        console.error('Error generating image description:', error.message, error.stack);
+        throw error;
+    }
 }
 
 async function generateImageFromText(prompt) {
-    const chatSession = model.startChat({ generationConfig });
-    const result = await chatSession.sendMessage(prompt);
+    try {
+        const chatSession = model.startChat({ generationConfig });
+        const result = await chatSession.sendMessage(prompt);
 
-    const filename = `generated-${Date.now()}.png`;
-    const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        const filename = `generated-${Date.now()}.png`;
+        const outputPath = path.join(__dirname, '../../public/uploads', filename);
 
-    const candidates = result.response.candidates;
-    for (const candidate of candidates) {
-        for (const part of candidate.content.parts) {
-            if (part.inlineData) {
-                fs.writeFileSync(outputPath, Buffer.from(part.inlineData.data, 'base64'));
-                return filename;
+        const candidates = result.response.candidates;
+        for (const candidate of candidates) {
+            for (const part of candidate.content.parts) {
+                if (part.inlineData) {
+                    await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
+                    return filename;
+                }
             }
         }
+        throw new Error('No image generated.');
+    } catch (error) {
+        console.error('Error generating image from text:', error.message, error.stack);
+        throw error;
     }
-    throw new Error('No image generated.');
 }
 
 async function generateInspiredArt(filePath, additionalInstructions = '') {
-    const file = await uploadToGemini(filePath);
-    const chatSession = model.startChat({ generationConfig });
+    try {
+        const file = await uploadToGemini(filePath);
+        const chatSession = model.startChat({ generationConfig });
 
-    // Step 1: Generate Description
-    let result = await chatSession.sendMessage([
-        {
-            fileData: {
-                mimeType: file.mimeType,
-                fileUri: file.uri,
+        // Step 1: Generate Description
+        let result = await chatSession.sendMessage([
+            {
+                fileData: {
+                    mimeType: file.mimeType,
+                    fileUri: file.uri,
+                },
             },
-        },
-        { text: descriptionPrompt },
-    ]);
-    const description = result.response.text().replace(/```/g, '');
+            { text: descriptionPrompt },
+        ]);
+        const description = result.response.text().replace(/```/g, '');
 
-    // Step 2: Generate Art Prompt
-    const artPromptRequest = additionalInstructions
-        ? `${description}\n\n${additionalInstructions}\n\n${artPromptInstruction}`
-        : `${description}\n\n${artPromptInstruction}`;
-    result = await chatSession.sendMessage(artPromptRequest);
-    const artPrompt = result.response.text().replace(/```/g, '');
+        // Step 2: Generate Art Prompt
+        const artPromptRequest = additionalInstructions
+            ? `${description}\n\n${additionalInstructions}\n\n${artPromptInstruction}`
+            : `${description}\n\n${artPromptInstruction}`;
+        result = await chatSession.sendMessage(artPromptRequest);
+        const artPrompt = result.response.text().replace(/```/g, '');
 
-    // Step 3: Generate Image from Art Prompt
-    const filename = `inspired-${Date.now()}.png`;
-    const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        // Step 3: Generate Image from Art Prompt
+        const filename = `inspired-${Date.now()}.png`;
+        const outputPath = path.join(__dirname, '../../public/uploads', filename);
 
-    result = await chatSession.sendMessage(artPrompt);
-    const candidates = result.response.candidates;
-    for (const candidate of candidates) {
-        for (const part of candidate.content.parts) {
-            if (part.inlineData) {
-                fs.writeFileSync(outputPath, Buffer.from(part.inlineData.data, 'base64'));
-                fs.unlinkSync(filePath); // Clean up
-                return { description, prompt: artPrompt, filename };
+        result = await chatSession.sendMessage(artPrompt);
+        const candidates = result.response.candidates;
+        for (const candidate of candidates) {
+            for (const part of candidate.content.parts) {
+                if (part.inlineData) {
+                    await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
+                    await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+                    return { description, prompt: artPrompt, filename };
+                }
             }
         }
-    }
 
-    fs.unlinkSync(filePath); // Clean up
-    return { description, prompt: artPrompt };
+        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        return { description, prompt: artPrompt };
+    } catch (error) {
+        console.error('Error generating inspired art:', error.message, error.stack);
+        throw error;
+    }
 }
 
 module.exports = {
