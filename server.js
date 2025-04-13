@@ -14,21 +14,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // API Routes
 app.use('/api', apiRoutes);
 
-// View Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src/views/index.html'));
-});
-
-app.get('/image-description', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src/views/image-description.html'));
-});
-
-app.get('/text-to-image', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src/views/text-to-image.html'));
-});
-
-app.get('/image-inspired', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src/views/image-inspired.html'));
+// Fallback to index.html for SPA-like behavior
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Start Server
