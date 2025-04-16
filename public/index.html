@@ -11,56 +11,47 @@
 </head>
 
 <body>
-    <nav class="navbar fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">Art Flow</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <button class="nav-link btn-nav active" data-section="home">Home</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link btn-nav" data-section="image-description">Describe</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link btn-nav" data-section="text-to-image">Text to Art</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link btn-nav" data-section="image-inspired">Inspired Art</button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container main-content">
+        <h1 class="page-title">Art Flow</h1>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <button class="nav-link btn-nav active" data-section="home">Home</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link btn-nav" data-section="image-description">Describe</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link btn-nav" data-section="text-to-image">Text to Art</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link btn-nav" data-section="image-inspired">Inspired Art</button>
+            </li>
+        </ul>
+
         <!-- Home Section -->
         <section id="home" class="section active">
             <div class="card-neo">
-                <h1>Art Flow</h1>
-                <p>Create and explore AI art.</p>
+                <h2>Create and Explore AI Art</h2>
+                <p>Discover three powerful tools to unleash your creativity with AI.</p>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <div class="card-neo">
                             <h3>Describe</h3>
-                            <p>Analyze images.</p>
+                            <p>Get detailed insights from your images.</p>
                             <button class="btn btn-primary" data-section="image-description">Go</button>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <div class="card-neo">
                             <h3>Text to Art</h3>
-                            <p>Words to visuals.</p>
+                            <p>Transform words into stunning visuals.</p>
                             <button class="btn btn-primary" data-section="text-to-image">Go</button>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <div class="card-neo">
                             <h3>Inspired Art</h3>
-                            <p>Remix images.</p>
+                            <p>Remix images into unique artworks.</p>
                             <button class="btn btn-primary" data-section="image-inspired">Go</button>
                         </div>
                     </div>
@@ -71,17 +62,20 @@
         <!-- Image Description Section -->
         <section id="image-description" class="section">
             <div class="card-neo">
-                <h1>Describe Image</h1>
+                <h2>Describe Image</h2>
                 <form id="imageDescriptionForm">
-                    <div class="mb-1">
-                        <label for="imageFile" class="form-label">Image</label>
+                    <div class="mb-2">
+                        <label for="imageFile" class="form-label">Upload Image</label>
                         <input type="file" class="form-control" id="imageFile" accept="image/*" required>
                     </div>
-                    <img id="imagePreview" class="img-preview" src="/images/placeholder.png" alt="Preview">
+                    <img id="imagePreview" class="img-preview" src="/images/input-placeholder.png" alt="Preview">
                     <button type="submit" class="btn btn-primary">
                         <span class="btn-text">Generate</span>
-                        <span class="spinner" style="display: none;"></span>
                     </button>
+                    <div class="loader-overlay" style="display: none;">
+                        <div class="loader"></div>
+                        <span>Loading...</span>
+                    </div>
                 </form>
                 <div class="output-container">
                     <h3>Result</h3>
@@ -94,21 +88,24 @@
         <!-- Text to Image Section -->
         <section id="text-to-image" class="section">
             <div class="card-neo">
-                <h1>Text to Art</h1>
+                <h2>Text to Art</h2>
                 <form id="textToImageForm">
-                    <div class="mb-1">
+                    <div class="mb-2">
                         <label for="textPrompt" class="form-label">Prompt</label>
-                        <textarea class="form-control" id="textPrompt" rows="3" placeholder="e.g., Sunset beach"
-                            required></textarea>
+                        <textarea class="form-control" id="textPrompt" rows="4"
+                            placeholder="e.g., A serene sunset beach" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">
                         <span class="btn-text">Generate</span>
-                        <span class="spinner" style="display: none;"></span>
                     </button>
+                    <div class="loader-overlay" style="display: none;">
+                        <div class="loader"></div>
+                        <span>Loading...</span>
+                    </div>
                 </form>
                 <div class="output-container">
                     <h3>Art</h3>
-                    <img id="generatedImage" class="img-preview" src="/images/placeholder.png" alt="Art">
+                    <img id="generatedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
                     <a id="downloadImage" class="btn btn-primary" style="display: none;" download>Download</a>
                 </div>
             </div>
@@ -117,22 +114,26 @@
         <!-- Image Inspired Art Section -->
         <section id="image-inspired" class="section">
             <div class="card-neo">
-                <h1>Inspired Art</h1>
+                <h2>Inspired Art</h2>
                 <form id="imageInspiredForm">
-                    <div class="mb-1">
-                        <label for="inspiredImageFile" class="form-label">Image</label>
+                    <div class="mb-2">
+                        <label for="inspiredImageFile" class="form-label">Upload Image</label>
                         <input type="file" class="form-control" id="inspiredImageFile" accept="image/*" required>
                     </div>
-                    <div class="mb-1">
-                        <label for="additionalInstructions" class="form-label">Notes</label>
-                        <textarea class="form-control" id="additionalInstructions" rows="3"
-                            placeholder="e.g., Bright colors"></textarea>
+                    <div class="mb-2">
+                        <label for="additionalInstructions" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="additionalInstructions" rows="4"
+                            placeholder="e.g., Use vibrant colors"></textarea>
                     </div>
-                    <img id="inspiredImagePreview" class="img-preview" src="/images/placeholder.png" alt="Preview">
+                    <img id="inspiredImagePreview" class="img-preview img-clickable" src="/images/input-placeholder.png"
+                        alt="Preview">
                     <button type="submit" class="btn btn-primary">
                         <span class="btn-text">Generate</span>
-                        <span class="spinner" style="display: none;"></span>
                     </button>
+                    <div class="loader-overlay" style="display: none;">
+                        <div class="loader"></div>
+                        <span>Loading...</span>
+                    </div>
                 </form>
                 <div class="output-container">
                     <h3>Description</h3>
@@ -146,11 +147,17 @@
                 </div>
                 <div class="output-container">
                     <h3>Art</h3>
-                    <img id="inspiredGeneratedImage" class="img-preview" src="/images/placeholder.png" alt="Art">
+                    <img id="inspiredGeneratedImage" class="img-preview" src="/images/generated-placeholder.png"
+                        alt="Art">
                     <a id="downloadInspiredImage" class="btn btn-primary" style="display: none;" download>Download</a>
                 </div>
             </div>
         </section>
+
+        <footer class="footer">
+            <p>Powered by Google Gemini Models</p>
+            <p>Developed by Abdullah Saleh</p>
+        </footer>
     </div>
 
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>

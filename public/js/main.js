@@ -13,8 +13,8 @@ function showAlert(message, type = 'success') {
 // Utility: Copy Text
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
-        .then(() => showAlert('Copied!', 'success'))
-        .catch(() => showAlert('Copy failed.', 'danger'));
+        .then(() => showAlert('Copied to clipboard!', 'success'))
+        .catch(() => showAlert('Failed to copy.', 'danger'));
 }
 
 // Section Management
@@ -31,9 +31,11 @@ function toggleSection(sectionId) {
 }
 
 // Utility: Toggle Loading State
-function toggleLoading(button, isLoading) {
-    button.disabled = isLoading;
-    button.classList.toggle('is-loading', isLoading);
+function toggleLoading(form, isLoading) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const loader = form.querySelector('.loader-overlay');
+    submitBtn.disabled = isLoading;
+    loader.style.display = isLoading ? 'flex' : 'none';
 }
 
 // Section 1: Image Description Generator
@@ -45,7 +47,6 @@ function setupImageDescription() {
     const preview = document.getElementById('imagePreview');
     const resultDiv = document.getElementById('descriptionResult');
     const copyBtn = document.getElementById('copyDescription');
-    const submitBtn = form.querySelector('button[type="submit"]');
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -54,7 +55,7 @@ function setupImageDescription() {
             resultDiv.textContent = '';
             copyBtn.style.display = 'none';
         } else {
-            preview.src = '/images/placeholder.png';
+            preview.src = '/images/input-placeholder.png';
         }
     });
 
@@ -62,11 +63,11 @@ function setupImageDescription() {
         e.preventDefault();
         const file = fileInput.files[0];
         if (!file) {
-            showAlert('Upload an image.', 'danger');
+            showAlert('Please upload an image.', 'danger');
             return;
         }
 
-        toggleLoading(submitBtn, true);
+        toggleLoading(form, true);
         const formData = new FormData();
         formData.append('image', file);
 
@@ -85,7 +86,7 @@ function setupImageDescription() {
         } catch (err) {
             showAlert('An error occurred.', 'danger');
         } finally {
-            toggleLoading(submitBtn, false);
+            toggleLoading(form, false);
         }
     });
 
@@ -102,17 +103,16 @@ function setupTextToImage() {
     const promptInput = document.getElementById('textPrompt');
     const preview = document.getElementById('generatedImage');
     const downloadBtn = document.getElementById('downloadImage');
-    const submitBtn = form.querySelector('button[type="submit"]');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const prompt = promptInput.value.trim();
         if (!prompt) {
-            showAlert('Enter a prompt.', 'danger');
+            showAlert('Please enter a prompt.', 'danger');
             return;
         }
 
-        toggleLoading(submitBtn, true);
+        toggleLoading(form, true);
         try {
             const response = await fetch('/api/text-to-image', {
                 method: 'POST',
@@ -130,7 +130,7 @@ function setupTextToImage() {
         } catch (err) {
             showAlert('An error occurred.', 'danger');
         } finally {
-            toggleLoading(submitBtn, false);
+            toggleLoading(form, false);
         }
     });
 }
@@ -149,7 +149,6 @@ function setupImageInspired() {
     const copyDescBtn = document.getElementById('copyInspiredDescription');
     const copyPromptBtn = document.getElementById('copyInspiredPrompt');
     const downloadBtn = document.getElementById('downloadInspiredImage');
-    const submitBtn = form.querySelector('button[type="submit"]');
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -157,13 +156,17 @@ function setupImageInspired() {
             preview.src = URL.createObjectURL(file);
             descriptionDiv.textContent = '';
             promptDiv.textContent = '';
-            imagePreview.src = '/images/placeholder.png';
+            imagePreview.src = '/images/generated-placeholder.png';
             copyDescBtn.style.display = 'none';
             copyPromptBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
         } else {
-            preview.src = '/images/placeholder.png';
+            preview.src = '/images/input-placeholder.png';
         }
+    });
+
+    preview.addEventListener('click', () => {
+        fileInput.click();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -172,11 +175,11 @@ function setupImageInspired() {
         const instructions = additionalInput.value.trim();
 
         if (!file) {
-            showAlert('Upload an image.', 'danger');
+            showAlert('Please upload an image.', 'danger');
             return;
         }
 
-        toggleLoading(submitBtn, true);
+        toggleLoading(form, true);
         const formData = new FormData();
         formData.append('image', file);
         if (instructions) {
@@ -205,7 +208,7 @@ function setupImageInspired() {
         } catch (err) {
             showAlert('An error occurred.', 'danger');
         } finally {
-            toggleLoading(submitBtn, false);
+            toggleLoading(form, false);
         }
     });
 
