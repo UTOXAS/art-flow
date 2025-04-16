@@ -1,13 +1,22 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs').promises;
 const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage } = require('../services/geminiService');
 
 const router = express.Router();
 
+// Ensure /tmp/uploads exists
+const uploadDir = path.join(__dirname, '../../tmp/uploads');
+fs.mkdir(uploadDir, { recursive: true }).catch(err => {
+    console.error('Error creating upload directory:', err.message);
+});
+
 // Configure Multer
 const storage = multer.diskStorage({
-    destination: path.join(__dirname, '../../public/uploads'),
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     },

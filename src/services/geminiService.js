@@ -172,7 +172,7 @@ async function generateImageFromText(prompt, language) {
         const result = await chatSession.sendMessage(effectivePrompt);
 
         const filename = `generated-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
@@ -218,7 +218,7 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         // Step 3: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `inspired-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
         const candidates = result.response.candidates;
@@ -262,7 +262,7 @@ async function generateArtFromDescription(description, language) {
         // Step 2: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `description-art-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
         const candidates = result.response.candidates;
@@ -290,7 +290,7 @@ async function regenerateImage(prompt) {
         const result = await chatSession.sendMessage(prompt);
 
         const filename = `regenerated-${Date.now()}.png`;
-        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+        const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {

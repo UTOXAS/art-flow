@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const apiRoutes = require('./src/routes/api');
-const fs = require('fs').promises;
 require('dotenv').config();
 
 const app = express();
@@ -35,33 +34,15 @@ app.use(auth);
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'tmp/uploads')));
 
 // API Routes
 app.use('/api', apiRoutes);
 
-// Serve index.html for all routes
+// Serve index.html for all non-static routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
-
-// Periodic cleanup of uploads folder (every 24 hours)
-const cleanupUploads = async () => {
-    const uploadsDir = path.join(__dirname, 'public/uploads');
-    try {
-        const files = await fs.readdir(uploadsDir);
-        for (const file of files) {
-            await fs.unlink(path.join(uploadsDir, file)).catch(err =>
-                console.warn(`Failed to delete ${file}: ${err.message}`)
-            );
-        }
-        console.log('Uploads folder cleaned.');
-    } catch (err) {
-        console.error(`Error cleaning uploads: ${err.message}`);
-    }
-};
-setInterval(cleanupUploads, 24 * 60 * 60 * 1000); // 24 hours
-cleanupUploads(); // Run on startup
 
 // Start Server
 app.listen(port, () => {
