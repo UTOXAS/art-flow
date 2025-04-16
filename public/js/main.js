@@ -3,8 +3,8 @@ function showAlert(message, type = 'success') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.innerHTML = `
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     document.body.prepend(alertDiv);
     setTimeout(() => alertDiv.remove(), 5000);
@@ -13,8 +13,27 @@ function showAlert(message, type = 'success') {
 // Utility: Copy Text
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
-        .then(() => showAlert('Copied to clipboard!', 'success'))
-        .catch(() => showAlert('Failed to copy.', 'danger'));
+        .then(() => showAlert('Copied!', 'success'))
+        .catch(() => showAlert('Copy failed.', 'danger'));
+}
+
+// Section Management
+function toggleSection(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.querySelector(`#${sectionId}`).classList.add('active');
+
+    document.querySelectorAll('.btn-nav').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.btn-nav[data-section="${sectionId}"]`).classList.add('active');
+}
+
+// Utility: Toggle Loading State
+function toggleLoading(button, isLoading) {
+    button.disabled = isLoading;
+    button.classList.toggle('is-loading', isLoading);
 }
 
 // Section 1: Image Description Generator
@@ -26,13 +45,16 @@ function setupImageDescription() {
     const preview = document.getElementById('imagePreview');
     const resultDiv = document.getElementById('descriptionResult');
     const copyBtn = document.getElementById('copyDescription');
+    const submitBtn = form.querySelector('button[type="submit"]');
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
             preview.src = URL.createObjectURL(file);
-            preview.classList.add('img-preview');
             resultDiv.textContent = '';
+            copyBtn.style.display = 'none';
+        } else {
+            preview.src = '/images/placeholder.png';
         }
     });
 
@@ -40,10 +62,11 @@ function setupImageDescription() {
         e.preventDefault();
         const file = fileInput.files[0];
         if (!file) {
-            showAlert('Please upload an image.', 'danger');
+            showAlert('Upload an image.', 'danger');
             return;
         }
 
+        toggleLoading(submitBtn, true);
         const formData = new FormData();
         formData.append('image', file);
 
@@ -60,7 +83,9 @@ function setupImageDescription() {
                 copyBtn.style.display = 'block';
             }
         } catch (err) {
-            showAlert(`An error occurred: ${err.message}`, 'danger');
+            showAlert('An error occurred.', 'danger');
+        } finally {
+            toggleLoading(submitBtn, false);
         }
     });
 
@@ -77,15 +102,17 @@ function setupTextToImage() {
     const promptInput = document.getElementById('textPrompt');
     const preview = document.getElementById('generatedImage');
     const downloadBtn = document.getElementById('downloadImage');
+    const submitBtn = form.querySelector('button[type="submit"]');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const prompt = promptInput.value.trim();
         if (!prompt) {
-            showAlert('Please enter a prompt.', 'danger');
+            showAlert('Enter a prompt.', 'danger');
             return;
         }
 
+        toggleLoading(submitBtn, true);
         try {
             const response = await fetch('/api/text-to-image', {
                 method: 'POST',
@@ -97,12 +124,13 @@ function setupTextToImage() {
                 showAlert(`Error: ${data.error}`, 'danger');
             } else {
                 preview.src = `/uploads/${data.filename}`;
-                preview.classList.add('img-preview');
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
         } catch (err) {
-            showAlert(`An error occurred: ${err.message}`, 'danger');
+            showAlert('An error occurred.', 'danger');
+        } finally {
+            toggleLoading(submitBtn, false);
         }
     });
 }
@@ -121,15 +149,20 @@ function setupImageInspired() {
     const copyDescBtn = document.getElementById('copyInspiredDescription');
     const copyPromptBtn = document.getElementById('copyInspiredPrompt');
     const downloadBtn = document.getElementById('downloadInspiredImage');
+    const submitBtn = form.querySelector('button[type="submit"]');
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
             preview.src = URL.createObjectURL(file);
-            preview.classList.add('img-preview');
             descriptionDiv.textContent = '';
             promptDiv.textContent = '';
-            imagePreview.src = '';
+            imagePreview.src = '/images/placeholder.png';
+            copyDescBtn.style.display = 'none';
+            copyPromptBtn.style.display = 'none';
+            downloadBtn.style.display = 'none';
+        } else {
+            preview.src = '/images/placeholder.png';
         }
     });
 
@@ -139,10 +172,11 @@ function setupImageInspired() {
         const instructions = additionalInput.value.trim();
 
         if (!file) {
-            showAlert('Please upload an image.', 'danger');
+            showAlert('Upload an image.', 'danger');
             return;
         }
 
+        toggleLoading(submitBtn, true);
         const formData = new FormData();
         formData.append('image', file);
         if (instructions) {
@@ -160,17 +194,18 @@ function setupImageInspired() {
             } else {
                 descriptionDiv.textContent = data.description;
                 promptDiv.textContent = data.prompt;
+                copyDescBtn.style.display = 'block';
+                copyPromptBtn.style.display = 'block';
                 if (data.filename) {
                     imagePreview.src = `/uploads/${data.filename}`;
-                    imagePreview.classList.add('img-preview');
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                 }
-                copyDescBtn.style.display = 'block';
-                copyPromptBtn.style.display = 'block';
             }
         } catch (err) {
-            showAlert(`An error occurred: ${err.message}`, 'danger');
+            showAlert('An error occurred.', 'danger');
+        } finally {
+            toggleLoading(submitBtn, false);
         }
     });
 
@@ -185,7 +220,15 @@ function setupImageInspired() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.btn-nav, .btn-primary[data-section]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const section = btn.getAttribute('data-section');
+            if (section) toggleSection(section);
+        });
+    });
+
     setupImageDescription();
     setupTextToImage();
     setupImageInspired();
+    toggleSection('home');
 });

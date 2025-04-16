@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Flow - Home</title>
+    <title>Art Flow</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="/images/favicon.png" type="image/png">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">Art Flow</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -19,54 +20,137 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/image-description">Image Description</a>
+                        <button class="nav-link btn-nav active" data-section="home">Home</button>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/text-to-image">Text to Image</a>
+                        <button class="nav-link btn-nav" data-section="image-description">Describe</button>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/image-inspired">Image Inspired Art</a>
+                        <button class="nav-link btn-nav" data-section="text-to-image">Text to Art</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link btn-nav" data-section="image-inspired">Inspired Art</button>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container my-5">
-        <div class="card p-4">
-            <h1>Welcome to Art Flow</h1>
-            <p class="lead">Explore the intersection of art and AI with our interactive platform. Create, describe, and
-                inspire with ease.</p>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h3>Image Description</h3>
-                            <p>Upload an image and get a detailed description.</p>
-                            <a href="/image-description" class="btn btn-primary btn-wiggle">Try It</a>
+    <div class="container main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="card-neo">
+                <h1>Art Flow</h1>
+                <p>Create and explore AI art.</p>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="card-neo">
+                            <h3>Describe</h3>
+                            <p>Analyze images.</p>
+                            <button class="btn btn-primary" data-section="image-description">Go</button>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h3>Text to Image</h3>
-                            <p>Turn your words into stunning visuals.</p>
-                            <a href="/text-to-image" class="btn btn-primary btn-wiggle">Try It</a>
+                    <div class="col-4">
+                        <div class="card-neo">
+                            <h3>Text to Art</h3>
+                            <p>Words to visuals.</p>
+                            <button class="btn btn-primary" data-section="text-to-image">Go</button>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h3>Image Inspired Art</h3>
-                            <p>Create new art inspired by your images.</p>
-                            <a href="/image-inspired" class="btn btn-primary btn-wiggle">Try It</a>
+                    <div class="col-4">
+                        <div class="card-neo">
+                            <h3>Inspired Art</h3>
+                            <p>Remix images.</p>
+                            <button class="btn btn-primary" data-section="image-inspired">Go</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Image Description Section -->
+        <section id="image-description" class="section">
+            <div class="card-neo">
+                <h1>Describe Image</h1>
+                <form id="imageDescriptionForm">
+                    <div class="mb-1">
+                        <label for="imageFile" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                    </div>
+                    <img id="imagePreview" class="img-preview" src="/images/placeholder.png" alt="Preview">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Generate</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+                <div class="output-container">
+                    <h3>Result</h3>
+                    <pre id="descriptionResult" class="output-text"></pre>
+                    <button id="copyDescription" class="btn btn-primary" style="display: none;">Copy</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Text to Image Section -->
+        <section id="text-to-image" class="section">
+            <div class="card-neo">
+                <h1>Text to Art</h1>
+                <form id="textToImageForm">
+                    <div class="mb-1">
+                        <label for="textPrompt" class="form-label">Prompt</label>
+                        <textarea class="form-control" id="textPrompt" rows="3" placeholder="e.g., Sunset beach"
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Generate</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+                <div class="output-container">
+                    <h3>Art</h3>
+                    <img id="generatedImage" class="img-preview" src="/images/placeholder.png" alt="Art">
+                    <a id="downloadImage" class="btn btn-primary" style="display: none;" download>Download</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Inspired Art Section -->
+        <section id="image-inspired" class="section">
+            <div class="card-neo">
+                <h1>Inspired Art</h1>
+                <form id="imageInspiredForm">
+                    <div class="mb-1">
+                        <label for="inspiredImageFile" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="inspiredImageFile" accept="image/*" required>
+                    </div>
+                    <div class="mb-1">
+                        <label for="additionalInstructions" class="form-label">Notes</label>
+                        <textarea class="form-control" id="additionalInstructions" rows="3"
+                            placeholder="e.g., Bright colors"></textarea>
+                    </div>
+                    <img id="inspiredImagePreview" class="img-preview" src="/images/placeholder.png" alt="Preview">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Generate</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+                <div class="output-container">
+                    <h3>Description</h3>
+                    <pre id="inspiredDescription" class="output-text"></pre>
+                    <button id="copyInspiredDescription" class="btn btn-primary" style="display: none;">Copy</button>
+                </div>
+                <div class="output-container">
+                    <h3>Prompt</h3>
+                    <pre id="inspiredPrompt" class="output-text"></pre>
+                    <button id="copyInspiredPrompt" class="btn btn-primary" style="display: none;">Copy</button>
+                </div>
+                <div class="output-container">
+                    <h3>Art</h3>
+                    <img id="inspiredGeneratedImage" class="img-preview" src="/images/placeholder.png" alt="Art">
+                    <a id="downloadInspiredImage" class="btn btn-primary" style="display: none;" download>Download</a>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
