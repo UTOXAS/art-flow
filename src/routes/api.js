@@ -8,17 +8,23 @@ const router = express.Router();
 
 // Ensure /tmp/uploads exists
 const uploadDir = path.join(__dirname, '../../tmp/uploads');
-fs.mkdir(uploadDir, { recursive: true }).catch(err => {
-    console.error('Error creating upload directory:', err.message);
-});
+fs.mkdir(uploadDir, { recursive: true })
+    .then(() => console.log('Upload directory created successfully:', uploadDir))
+    .catch(err => console.error('Error creating upload directory:', err.message));
 
-// Configure Multer
+// Configure Multer with sanitized filenames
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
+        // Sanitize filename: keep only alphanumeric, dashes, and extension
+        const ext = path.extname(file.originalname).toLowerCase();
+        const sanitizedName = file.originalname
+            .replace(/[^a-zA-Z0-9]/g, '-') // Replace non-alphanumeric with dashes
+            .replace(/-+/g, '-') // Collapse multiple dashes
+            .toLowerCase();
+        cb(null, `${Date.now()}-${sanitizedName}${ext}`);
     },
 });
 const upload = multer({ storage });
@@ -62,7 +68,7 @@ router.post('/image-inspired', upload.single('image'), async (req, res) => {
         res.json(result);
     } catch (error) {
         console.error('Error in /image-inspired:', error.message, error.stack);
-        res.status(500).json({ error: 'Failed to generate inspired art.' });
+        res.status(500).json({ error: `Failed to generate inspired art: ${error.message}` });
     }
 });
 

@@ -92,6 +92,8 @@ and the prompt should be in a triple backticks block.
 
 async function uploadToGemini(filePath) {
     try {
+        // Verify file exists
+        await fs.access(filePath);
         const mimeType = mime.lookup(filePath);
         if (!mimeType) {
             throw new Error(`Unknown MIME type for file: ${filePath}`);
@@ -103,7 +105,7 @@ async function uploadToGemini(filePath) {
         return uploadResult.file;
     } catch (error) {
         console.error('Error uploading to Gemini:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to upload file: ${error.message}`);
     }
 }
 
@@ -193,7 +195,9 @@ async function generateImageFromText(prompt, language) {
 async function generateInspiredArt(filePath, additionalInstructions = '', language = 'en') {
     let tempFilePath = filePath;
     try {
-        const file = await uploadToGemini(filePath);
+        // Verify file exists before proceeding
+        await fs.access(tempFilePath);
+        const file = await uploadToGemini(tempFilePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
         // Step 1: Generate Description
@@ -241,7 +245,7 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
     } catch (error) {
         console.error('Error generating inspired art:', error.message, error.stack);
         await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
-        throw error;
+        throw new Error(`Failed to generate inspired art: ${error.message}`);
     }
 }
 

@@ -37,7 +37,7 @@ const translations = {
         no_prompt: 'يرجى إدخال موجه.',
         no_description: 'يرجى إدخال وصف.',
         error: 'خطأ: ',
-        server_error: 'حدث خطأ.'
+        server_error: 'حدث خطأ في الخادم. حاول مرة أخرى لاحقًا.'
     },
     en: {
         title: 'Art Flow',
@@ -76,7 +76,7 @@ const translations = {
         no_prompt: 'Please enter a prompt.',
         no_description: 'Please enter a description.',
         error: 'Error: ',
-        server_error: 'An error occurred.'
+        server_error: 'A server error occurred. Please try again later.'
     }
 };
 
