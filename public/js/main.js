@@ -1,5 +1,118 @@
+// Language Management
+const translations = {
+    ar: {
+        title: 'تدفق الفن',
+        switch_to_english: 'التبديل إلى الإنجليزية',
+        switch_to_arabic: 'التبديل إلى العربية',
+        home: 'الرئيسية',
+        describe: 'الوصف',
+        text_to_art: 'من النص إلى الفن',
+        inspired_art: 'فن مستوحى',
+        art_from_description: 'فن من الوصف',
+        create_explore: 'إنشاء واستكشاف فن الذكاء الاصطناعي',
+        discover_tools: 'اكتشف أربع أدوات قوية لإطلاق العنان لإبداعك باستخدام الذكاء الاصطناعي.',
+        describe_info: 'احصل على رؤى تفصيلية من صورك.',
+        text_to_art_info: 'حول الكلمات إلى صور بصرية مذهلة.',
+        inspired_art_info: 'أعد مزج الصور إلى أعمال فنية فريدة.',
+        art_from_description_info: 'أنشئ فنًا من وصف نصي.',
+        go: 'اذهب',
+        describe_image: 'وصف الصورة',
+        upload_image: 'رفع الصورة',
+        generate: 'إنشاء',
+        loading: 'جارٍ التحميل...',
+        result: 'النتيجة',
+        copy: 'نسخ',
+        text_to_art: 'من النص إلى الفن',
+        prompt: 'الموجه',
+        art: 'الفن',
+        download: 'تنزيل',
+        inspired_art: 'فن مستوحى',
+        notes: 'ملاحظات (اختياري)',
+        description: 'الوصف',
+        art_from_description: 'فن من الوصف',
+        regenerate: 'إعادة إنشاء',
+        powered_by: 'مدعوم بموديلات جوجل جيميني',
+        dedicated_to: 'مكرس لسهيلة',
+        developed_by: 'طُور بواسطة عبدالله صالح',
+        copied: 'تم النسخ إلى الحافظة!',
+        failed_copy: 'فشل في النسخ.',
+        no_image: 'يرجى رفع صورة.',
+        no_prompt: 'يرجى إدخال موجه.',
+        no_description: 'يرجى إدخال وصف.',
+        error: 'حدث خطأ: ',
+        server_error: 'حدث خطأ في الخادم.'
+    },
+    en: {
+        title: 'Art Flow',
+        switch_to_english: 'Switch to English',
+        switch_to_arabic: 'Switch to Arabic',
+        home: 'Home',
+        describe: 'Describe',
+        text_to_art: 'Text to Art',
+        inspired_art: 'Inspired Art',
+        art_from_description: 'Art from Description',
+        create_explore: 'Create and Explore AI Art',
+        discover_tools: 'Discover four powerful tools to unleash your creativity with AI.',
+        describe_info: 'Get detailed insights from your images.',
+        text_to_art_info: 'Transform words into stunning visuals.',
+        inspired_art_info: 'Remix images into unique artworks.',
+        art_from_description_info: 'Create art from a text description.',
+        go: 'Go',
+        describe_image: 'Describe Image',
+        upload_image: 'Upload Image',
+        generate: 'Generate',
+        loading: 'Loading...',
+        result: 'Result',
+        copy: 'Copy',
+        text_to_art: 'Text to Art',
+        prompt: 'Prompt',
+        art: 'Art',
+        download: 'Download',
+        inspired_art: 'Inspired Art',
+        notes: 'Notes (Optional)',
+        description: 'Description',
+        art_from_description: 'Art from Description',
+        regenerate: 'Regenerate',
+        powered_by: 'Powered by Google Gemini Models',
+        dedicated_to: 'Dedicated to Sohaila',
+        developed_by: 'Developed by Abdullah Saleh',
+        copied: 'Copied to clipboard!',
+        failed_copy: 'Failed to copy.',
+        no_image: 'Please upload an image.',
+        no_prompt: 'Please enter a prompt.',
+        no_description: 'Please enter a description.',
+        error: 'Error: ',
+        server_error: 'An error occurred.'
+    }
+};
+
+function setLanguage(lang) {
+    localStorage.setItem('language', lang);
+    document.documentElement.lang = lang;
+    document.body.setAttribute('lang', lang);
+    document.querySelectorAll('[data-translate-key]').forEach(elem => {
+        const key = elem.getAttribute('data-translate-key');
+        elem.textContent = translations[lang][key];
+    });
+    document.getElementById('languageToggle').textContent = translations[lang][lang === 'ar' ? 'switch_to_english' : 'switch_to_arabic'];
+    document.getElementById('textPrompt').placeholder = lang === 'ar' ? 'مثال: شاطئ غروب هادئ' : 'e.g., A serene sunset beach';
+    document.getElementById('additionalInstructions').placeholder = lang === 'ar' ? 'مثال: استخدم ألوانًا نابضة بالحياة' : 'e.g., Use vibrant colors';
+    document.getElementById('descriptionInput').placeholder = lang === 'ar' ? 'مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي' : 'e.g., A man sitting on a concrete wall at night by a body of water';
+}
+
+function toggleLanguage() {
+    const currentLang = localStorage.getItem('language') || 'ar';
+    const newLang = currentLang === 'ar' ? 'en' : 'ar';
+    setLanguage(newLang);
+}
+
 // Utility: Show Alert
-function showAlert(message, type = 'success') {
+function showAlert(messageKey, params = {}, type = 'success') {
+    const lang = localStorage.getItem('language') || 'ar';
+    let message = translations[lang][messageKey];
+    if (params.error) {
+        message += params.error;
+    }
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.innerHTML = `
@@ -13,8 +126,8 @@ function showAlert(message, type = 'success') {
 // Utility: Copy Text
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
-        .then(() => showAlert('Copied to clipboard!', 'success'))
-        .catch(() => showAlert('Failed to copy.', 'danger'));
+        .then(() => showAlert('copied', {}, 'success'))
+        .catch(() => showAlert('failed_copy', {}, 'danger'));
 }
 
 // Section Management
@@ -47,6 +160,7 @@ function setupImageDescription() {
     const preview = document.getElementById('imagePreview');
     const resultDiv = document.getElementById('descriptionResult');
     const copyBtn = document.getElementById('copyDescription');
+    const isArabic = localStorage.getItem('language') === 'ar';
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -63,13 +177,14 @@ function setupImageDescription() {
         e.preventDefault();
         const file = fileInput.files[0];
         if (!file) {
-            showAlert('Please upload an image.', 'danger');
+            showAlert('no_image', {}, 'danger');
             return;
         }
 
         toggleLoading(form, true);
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('language', localStorage.getItem('language') || 'ar');
 
         try {
             const response = await fetch('/api/image-description', {
@@ -78,13 +193,13 @@ function setupImageDescription() {
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(`Error: ${data.error}`, 'danger');
+                showAlert('error', { error: data.error }, 'danger');
             } else {
                 resultDiv.textContent = data.description;
                 copyBtn.style.display = 'block';
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
@@ -108,7 +223,7 @@ function setupTextToImage() {
         e.preventDefault();
         const prompt = promptInput.value.trim();
         if (!prompt) {
-            showAlert('Please enter a prompt.', 'danger');
+            showAlert('no_prompt', {}, 'danger');
             return;
         }
 
@@ -117,18 +232,18 @@ function setupTextToImage() {
             const response = await fetch('/api/text-to-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({ prompt, language: localStorage.getItem('language') || 'ar' }),
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(`Error: ${data.error}`, 'danger');
+                showAlert('error', { error: data.error }, 'danger');
             } else {
                 preview.src = `/uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
@@ -149,6 +264,8 @@ function setupImageInspired() {
     const copyDescBtn = document.getElementById('copyInspiredDescription');
     const copyPromptBtn = document.getElementById('copyInspiredPrompt');
     const downloadBtn = document.getElementById('downloadInspiredImage');
+    const regenerateBtn = document.getElementById('regenerateInspiredImage');
+    let currentPrompt = '';
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -160,6 +277,7 @@ function setupImageInspired() {
             copyDescBtn.style.display = 'none';
             copyPromptBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
+            regenerateBtn.style.display = 'none';
         } else {
             preview.src = '/images/input-placeholder.png';
         }
@@ -175,13 +293,14 @@ function setupImageInspired() {
         const instructions = additionalInput.value.trim();
 
         if (!file) {
-            showAlert('Please upload an image.', 'danger');
+            showAlert('no_image', {}, 'danger');
             return;
         }
 
         toggleLoading(form, true);
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('language', localStorage.getItem('language') || 'ar');
         if (instructions) {
             formData.append('instructions', instructions);
         }
@@ -193,20 +312,22 @@ function setupImageInspired() {
             });
             const data = await response.json();
             if (data.error) {
-                showAlert(`Error: ${data.error}`, 'danger');
+                showAlert('error', { error: data.error }, 'danger');
             } else {
                 descriptionDiv.textContent = data.description;
                 promptDiv.textContent = data.prompt;
+                currentPrompt = data.englishPrompt || data.prompt;
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
                     imagePreview.src = `/uploads/${data.filename}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
+                    regenerateBtn.style.display = 'block';
                 }
             }
         } catch (err) {
-            showAlert('An error occurred.', 'danger');
+            showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
@@ -219,10 +340,125 @@ function setupImageInspired() {
     copyPromptBtn.addEventListener('click', () => {
         copyToClipboard(promptDiv.textContent);
     });
+
+    regenerateBtn.addEventListener('click', async () => {
+        if (!currentPrompt) {
+            showAlert('no_prompt', {}, 'danger');
+            return;
+        }
+
+        toggleLoading(form, true);
+        try {
+            const response = await fetch('/api/regenerate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: currentPrompt }),
+            });
+            const data = await response.json();
+            if (data.error) {
+                showAlert('error', { error: data.error }, 'danger');
+            } else {
+                imagePreview.src = `/uploads/${data.filename}`;
+                downloadBtn.style.display = 'block';
+                downloadBtn.href = imagePreview.src;
+            }
+        } catch (err) {
+            showAlert('server_error', {}, 'danger');
+        } finally {
+            toggleLoading(form, false);
+        }
+    });
+}
+
+// Section 4: Description-to-Art Generator
+function setupDescriptionToArt() {
+    const form = document.getElementById('descriptionToArtForm');
+    if (!form) return;
+
+    const descriptionInput = document.getElementById('descriptionInput');
+    const promptDiv = document.getElementById('artPrompt');
+    const imagePreview = document.getElementById('artGeneratedImage');
+    const copyPromptBtn = document.getElementById('copyArtPrompt');
+    const downloadBtn = document.getElementById('downloadArtImage');
+    const regenerateBtn = document.getElementById('regenerateArtImage');
+    let currentPrompt = '';
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const description = descriptionInput.value.trim();
+        if (!description) {
+            showAlert('no_description', {}, 'danger');
+            return;
+        }
+
+        toggleLoading(form, true);
+        try {
+            const response = await fetch('/api/description-to-art', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ description, language: localStorage.getItem('language') || 'ar' }),
+            });
+            const data = await response.json();
+            if (data.error) {
+                showAlert('error', { error: data.error }, 'danger');
+            } else {
+                promptDiv.textContent = data.prompt;
+                currentPrompt = data.englishPrompt || data.prompt;
+                copyPromptBtn.style.display = 'block';
+                if (data.filename) {
+                    imagePreview.src = `/uploads/${data.filename}`;
+                    downloadBtn.style.display = 'block';
+                    downloadBtn.href = imagePreview.src;
+                    regenerateBtn.style.display = 'block';
+                }
+            }
+        } catch (err) {
+            showAlert('server_error', {}, 'danger');
+        } finally {
+            toggleLoading(form, false);
+        }
+    });
+
+    copyPromptBtn.addEventListener('click', () => {
+        copyToClipboard(promptDiv.textContent);
+    });
+
+    regenerateBtn.addEventListener('click', async () => {
+        if (!currentPrompt) {
+            showAlert('no_prompt', {}, 'danger');
+            return;
+        }
+
+        toggleLoading(form, true);
+        try {
+            const response = await fetch('/api/regenerate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: currentPrompt }),
+            });
+            const data = await response.json();
+            if (data.error) {
+                showAlert('error', { error: data.error }, 'danger');
+            } else {
+                imagePreview.src = `/uploads/${data.filename}`;
+                downloadBtn.style.display = 'block';
+                downloadBtn.href = imagePreview.src;
+            }
+        } catch (err) {
+            showAlert('server_error', {}, 'danger');
+        } finally {
+            toggleLoading(form, false);
+        }
+    });
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('language') || 'ar';
+    setLanguage(savedLang);
+
+    document.getElementById('languageToggle').addEventListener('click', toggleLanguage);
+
     document.querySelectorAll('.btn-nav, .btn-primary[data-section]').forEach(btn => {
         btn.addEventListener('click', () => {
             const section = btn.getAttribute('data-section');
@@ -233,5 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImageDescription();
     setupTextToImage();
     setupImageInspired();
+    setupDescriptionToArt();
     toggleSection('home');
 });

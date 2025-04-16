@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Flow</title>
+    <title data-translate-key="title">تدفق الفن</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="/images/favicon.ico" type="image/icon">
@@ -12,47 +12,70 @@
 
 <body>
     <div class="container main-content">
-        <h1 class="page-title">Art Flow</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="page-title" data-translate-key="title">تدفق الفن</h1>
+            <button id="languageToggle" class="btn btn-primary" data-translate-key="switch_to_english">التبديل إلى
+                الإنجليزية</button>
+        </div>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <button class="nav-link btn-nav active" data-section="home">Home</button>
+                <button class="nav-link btn-nav active" data-section="home" data-translate-key="home">الرئيسية</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link btn-nav" data-section="image-description">Describe</button>
+                <button class="nav-link btn-nav" data-section="image-description"
+                    data-translate-key="describe">الوصف</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link btn-nav" data-section="text-to-image">Text to Art</button>
+                <button class="nav-link btn-nav" data-section="text-to-image" data-translate-key="text_to_art">من النص
+                    إلى الفن</button>
             </li>
             <li class="nav-item">
-                <button class="nav-link btn-nav" data-section="image-inspired">Inspired Art</button>
+                <button class="nav-link btn-nav" data-section="image-inspired" data-translate-key="inspired_art">فن
+                    مستوحى</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link btn-nav" data-section="description-to-art"
+                    data-translate-key="art_from_description">فن من الوصف</button>
             </li>
         </ul>
 
         <!-- Home Section -->
         <section id="home" class="section active">
             <div class="card-neo">
-                <h2>Create and Explore AI Art</h2>
-                <p>Discover three powerful tools to unleash your creativity with AI.</p>
+                <h2 data-translate-key="create_explore">إنشاء واستكشاف فن الذكاء الاصطناعي</h2>
+                <p data-translate-key="discover_tools">اكتشف أربع أدوات قوية لإطلاق العنان لإبداعك باستخدام الذكاء
+                    الاصطناعي.</p>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card-neo">
-                            <h3>Describe</h3>
-                            <p>Get detailed insights from your images.</p>
-                            <button class="btn btn-primary" data-section="image-description">Go</button>
+                            <h3 data-translate-key="describe">الوصف</h3>
+                            <p data-translate-key="describe_info">احصل على رؤى تفصيلية من صورك.</p>
+                            <button class="btn btn-primary" data-section="image-description"
+                                data-translate-key="go">اذهب</button>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card-neo">
-                            <h3>Text to Art</h3>
-                            <p>Transform words into stunning visuals.</p>
-                            <button class="btn btn-primary" data-section="text-to-image">Go</button>
+                            <h3 data-translate-key="text_to_art">من النص إلى الفن</h3>
+                            <p data-translate-key="text_to_art_info">حول الكلمات إلى صور بصرية مذهلة.</p>
+                            <button class="btn btn-primary" data-section="text-to-image"
+                                data-translate-key="go">اذهب</button>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card-neo">
-                            <h3>Inspired Art</h3>
-                            <p>Remix images into unique artworks.</p>
-                            <button class="btn btn-primary" data-section="image-inspired">Go</button>
+                            <h3 data-translate-key="inspired_art">فن مستوحى</h3>
+                            <p data-translate-key="inspired_art_info">أعد مزج الصور إلى أعمال فنية فريدة.</p>
+                            <button class="btn btn-primary" data-section="image-inspired"
+                                data-translate-key="go">اذهب</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card-neo">
+                            <h3 data-translate-key="art_from_description">فن من الوصف</h3>
+                            <p data-translate-key="art_from_description_info">أنشئ فنًا من وصف نصي.</p>
+                            <button class="btn btn-primary" data-section="description-to-art"
+                                data-translate-key="go">اذهب</button>
                         </div>
                     </div>
                 </div>
@@ -62,25 +85,26 @@
         <!-- Image Description Section -->
         <section id="image-description" class="section">
             <div class="card-neo">
-                <h2>Describe Image</h2>
+                <h2 data-translate-key="describe_image">وصف الصورة</h2>
                 <form id="imageDescriptionForm">
                     <div class="mb-2">
-                        <label for="imageFile" class="form-label">Upload Image</label>
+                        <label for="imageFile" class="form-label" data-translate-key="upload_image">رفع الصورة</label>
                         <input type="file" class="form-control" id="imageFile" accept="image/*" required>
                     </div>
                     <img id="imagePreview" class="img-preview" src="/images/input-placeholder.png" alt="Preview">
                     <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Generate</span>
+                        <span class="btn-text" data-translate-key="generate">إنشاء</span>
                     </button>
                     <div class="loader-overlay" style="display: none;">
                         <div class="loader"></div>
-                        <span>Loading...</span>
+                        <span data-translate-key="loading">جارٍ التحميل...</span>
                     </div>
                 </form>
                 <div class="output-container">
-                    <h3>Result</h3>
+                    <h3 data-translate-key="result">النتيجة</h3>
                     <pre id="descriptionResult" class="output-text"></pre>
-                    <button id="copyDescription" class="btn btn-primary" style="display: none;">Copy</button>
+                    <button id="copyDescription" class="btn btn-primary" style="display: none;"
+                        data-translate-key="copy">نسخ</button>
                 </div>
             </div>
         </section>
@@ -88,25 +112,26 @@
         <!-- Text to Image Section -->
         <section id="text-to-image" class="section">
             <div class="card-neo">
-                <h2>Text to Art</h2>
+                <h2 data-translate-key="text_to_art">من النص إلى الفن</h2>
                 <form id="textToImageForm">
                     <div class="mb-2">
-                        <label for="textPrompt" class="form-label">Prompt</label>
-                        <textarea class="form-control" id="textPrompt" rows="4"
-                            placeholder="e.g., A serene sunset beach" required></textarea>
+                        <label for="textPrompt" class="form-label" data-translate-key="prompt">الموجه</label>
+                        <textarea class="form-control" id="textPrompt" rows="4" placeholder="مثال: شاطئ غروب هادئ"
+                            required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Generate</span>
+                        <span class="btn-text" data-translate-key="generate">إنشاء</span>
                     </button>
                     <div class="loader-overlay" style="display: none;">
                         <div class="loader"></div>
-                        <span>Loading...</span>
+                        <span data-translate-key="loading">جارٍ التحميل...</span>
                     </div>
                 </form>
                 <div class="output-container">
-                    <h3>Art</h3>
+                    <h3 data-translate-key="art">الفن</h3>
                     <img id="generatedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
-                    <a id="downloadImage" class="btn btn-primary" style="display: none;" download>Download</a>
+                    <a id="downloadImage" class="btn btn-primary" style="display: none;" download
+                        data-translate-key="download">تنزيل</a>
                 </div>
             </div>
         </section>
@@ -114,49 +139,96 @@
         <!-- Image Inspired Art Section -->
         <section id="image-inspired" class="section">
             <div class="card-neo">
-                <h2>Inspired Art</h2>
+                <h2 data-translate-key="inspired_art">فن مستوحى</h2>
                 <form id="imageInspiredForm">
                     <div class="mb-2">
-                        <label for="inspiredImageFile" class="form-label">Upload Image</label>
+                        <label for="inspiredImageFile" class="form-label" data-translate-key="upload_image">رفع
+                            الصورة</label>
                         <input type="file" class="form-control" id="inspiredImageFile" accept="image/*" required>
                     </div>
                     <div class="mb-2">
-                        <label for="additionalInstructions" class="form-label">Notes (Optional)</label>
+                        <label for="additionalInstructions" class="form-label" data-translate-key="notes">ملاحظات
+                            (اختياري)</label>
                         <textarea class="form-control" id="additionalInstructions" rows="4"
-                            placeholder="e.g., Use vibrant colors"></textarea>
+                            placeholder="مثال: استخدم ألوانًا نابضة بالحياة"></textarea>
                     </div>
                     <img id="inspiredImagePreview" class="img-preview img-clickable" src="/images/input-placeholder.png"
                         alt="Preview">
                     <button type="submit" class="btn btn-primary">
-                        <span class="btn-text">Generate</span>
+                        <span class="btn-text" data-translate-key="generate">إنشاء</span>
                     </button>
                     <div class="loader-overlay" style="display: none;">
                         <div class="loader"></div>
-                        <span>Loading...</span>
+                        <span data-translate-key="loading">جارٍ التحميل...</span>
                     </div>
                 </form>
                 <div class="output-container">
-                    <h3>Description</h3>
+                    <h3 data-translate-key="description">الوصف</h3>
                     <pre id="inspiredDescription" class="output-text"></pre>
-                    <button id="copyInspiredDescription" class="btn btn-primary" style="display: none;">Copy</button>
+                    <button id="copyInspiredDescription" class="btn btn-primary" style="display: none;"
+                        data-translate-key="copy">نسخ</button>
                 </div>
                 <div class="output-container">
-                    <h3>Prompt</h3>
+                    <h3 data-translate-key="prompt">الموجه</h3>
                     <pre id="inspiredPrompt" class="output-text"></pre>
-                    <button id="copyInspiredPrompt" class="btn btn-primary" style="display: none;">Copy</button>
+                    <button id="copyInspiredPrompt" class="btn btn-primary" style="display: none;"
+                        data-translate-key="copy">نسخ</button>
                 </div>
                 <div class="output-container">
-                    <h3>Art</h3>
+                    <h3 data-translate-key="art">الفن</h3>
                     <img id="inspiredGeneratedImage" class="img-preview" src="/images/generated-placeholder.png"
                         alt="Art">
-                    <a id="downloadInspiredImage" class="btn btn-primary" style="display: none;" download>Download</a>
+                    <div class="d-flex gap-2">
+                        <a id="downloadInspiredImage" class="btn btn-primary" style="display: none;" download
+                            data-translate-key="download">تنزيل</a>
+                        <button id="regenerateInspiredImage" class="btn btn-primary" style="display: none;"
+                            data-translate-key="regenerate">إعادة إنشاء</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Description to Art Section -->
+        <section id="description-to-art" class="section">
+            <div class="card-neo">
+                <h2 data-translate-key="art_from_description">فن من الوصف</h2>
+                <form id="descriptionToArtForm">
+                    <div class="mb-2">
+                        <label for="descriptionInput" class="form-label" data-translate-key="description">الوصف</label>
+                        <textarea class="form-control" id="descriptionInput" rows="6"
+                            placeholder="مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text" data-translate-key="generate">إنشاء</span>
+                    </button>
+                    <div class="loader-overlay" style="display: none;">
+                        <div class="loader"></div>
+                        <span data-translate-key="loading">جارٍ التحميل...</span>
+                    </div>
+                </form>
+                <div class="output-container">
+                    <h3 data-translate-key="prompt">الموجه</h3>
+                    <pre id="artPrompt" class="output-text"></pre>
+                    <button id="copyArtPrompt" class="btn btn-primary" style="display: none;"
+                        data-translate-key="copy">نسخ</button>
+                </div>
+                <div class="output-container">
+                    <h3 data-translate-key="art">الفن</h3>
+                    <img id="artGeneratedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
+                    <div class="d-flex gap-2">
+                        <a id="downloadArtImage" class="btn btn-primary" style="display: none;" download
+                            data-translate-key="download">تنزيل</a>
+                        <button id="regenerateArtImage" class="btn btn-primary" style="display: none;"
+                            data-translate-key="regenerate">إعادة إنشاء</button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <footer class="footer">
-            <p>Powered by Google Gemini Models</p>
-            <p>Developed by Abdullah Saleh</p>
+            <p data-translate-key="powered_by">مدعوم بموديلات جوجل جيميني</p>
+            <p data-translate-key="dedicated_to">مكرس لسهيلة</p>
+            <p data-translate-key="developed_by">طُور بواسطة عبدالله صالح</p>
         </footer>
     </div>
 

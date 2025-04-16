@@ -107,7 +107,32 @@ async function uploadToGemini(filePath) {
     }
 }
 
-async function generateImageDescription(filePath) {
+async function translateToArabic(text) {
+    try {
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
+        const prompt = `translate this to Arabic:\n\n${text}\n\nMake your answer only contains the translation inside triple backticks block, without any leading or trailing text.`;
+        const result = await chatSession.sendMessage(prompt);
+        return result.response.text().replace(/```/g, '');
+    } catch (error) {
+        console.error('Error translating to Arabic:', error.message, error.stack);
+        throw error;
+    }
+}
+
+async function translateToEnglish(text) {
+    try {
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
+        const prompt = `translate this to English:\n\n${text}\n\nMake your answer only contains the translation inside triple backticks block, without any leading or trailing text.`;
+        const result = await chatSession.sendMessage(prompt);
+        return result.response.text().replace(/```/g, '');
+    } catch (error) {
+        console.error('Error translating to English:', error.message, error.stack);
+        throw error;
+    }
+}
+
+async function generateImageDescription(filePath, language) {
+    let tempFilePath = filePath;
     try {
         const file = await uploadToGemini(filePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
@@ -122,20 +147,29 @@ async function generateImageDescription(filePath) {
             { text: descriptionPrompt },
         ]);
 
-        const description = result.response.text().replace(/```/g, '');
-        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        let description = result.response.text().replace(/```/g, '');
+        if (language === 'ar') {
+            description = await translateToArabic(description);
+        }
+
+        await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
         return description;
     } catch (error) {
         console.error('Error generating image description:', error.message, error.stack);
-        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
         throw error;
     }
 }
 
-async function generateImageFromText(prompt) {
+async function generateImageFromText(prompt, language) {
     try {
+        let effectivePrompt = prompt;
+        if (language === 'ar') {
+            effectivePrompt = await translateToEnglish(prompt);
+        }
+
         const chatSession = generationModel.startChat({ generationConfig });
-        const result = await chatSession.sendMessage(prompt);
+        const result = await chatSession.sendMessage(effectivePrompt);
 
         const filename = `generated-${Date.now()}.png`;
         const outputPath = path.join(__dirname, '../../public/uploads', filename);
@@ -156,7 +190,7 @@ async function generateImageFromText(prompt) {
     }
 }
 
-async function generateInspiredArt(filePath, additionalInstructions = '') {
+async function generateInspiredArt(filePath, additionalInstructions = '', language = 'en') {
     let tempFilePath = filePath;
     try {
         const file = await uploadToGemini(filePath);
@@ -172,7 +206,7 @@ async function generateInspiredArt(filePath, additionalInstructions = '') {
             },
             { text: descriptionPrompt },
         ]);
-        const description = result.response.text().replace(/```/g, '');
+        let description = result.response.text().replace(/```/g, '');
 
         // Step 2: Generate Art Prompt
         const artPromptRequest = additionalInstructions
@@ -192,17 +226,84 @@ async function generateInspiredArt(filePath, additionalInstructions = '') {
             for (const part of candidate.content.parts) {
                 if (part.inlineData) {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
+                    const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
+                    const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
                     await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
-                    return { description, prompt: artPrompt, filename };
+                    return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt, filename };
                 }
             }
         }
 
+        const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
+        const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
         await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
-        return { description, prompt: artPrompt };
+        return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt };
     } catch (error) {
         console.error('Error generating inspired art:', error.message, error.stack);
         await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
+        throw error;
+    }
+}
+
+async function generateArtFromDescription(description, language) {
+    try {
+        let effectiveDescription = description;
+        if (language === 'ar') {
+            effectiveDescription = await translateToEnglish(description);
+        }
+
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
+
+        // Step 1: Generate Art Prompt
+        const artPromptRequest = `${effectiveDescription}\n\n${artPromptInstruction}`;
+        let result = await chatSession.sendMessage(artPromptRequest);
+        const artPrompt = result.response.text().replace(/```/g, '');
+
+        // Step 2: Generate Image from Art Prompt
+        const imageSession = generationModel.startChat({ generationConfig });
+        const filename = `description-art-${Date.now()}.png`;
+        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+
+        result = await imageSession.sendMessage(artPrompt);
+        const candidates = result.response.candidates;
+        for (const candidate of candidates) {
+            for (const part of candidate.content.parts) {
+                if (part.inlineData) {
+                    await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
+                    const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
+                    return { prompt: displayPrompt, englishPrompt: artPrompt, filename };
+                }
+            }
+        }
+
+        const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
+        return { prompt: displayPrompt, englishPrompt: artPrompt };
+    } catch (error) {
+        console.error('Error generating art from description:', error.message, error.stack);
+        throw error;
+    }
+}
+
+async function regenerateImage(prompt) {
+    try {
+        const chatSession = generationModel.startChat({ generationConfig });
+        const result = await chatSession.sendMessage(prompt);
+
+        const filename = `regenerated-${Date.now()}.png`;
+        const outputPath = path.join(__dirname, '../../public/uploads', filename);
+
+        const candidates = result.response.candidates;
+        for (const candidate of candidates) {
+            for (const part of candidate.content.parts) {
+                if (part.inlineData) {
+                    await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
+                    return filename;
+                }
+            }
+        }
+        throw new Error('No image generated.');
+    } catch (error) {
+        console.error('Error regenerating image:', error.message, error.stack);
         throw error;
     }
 }
@@ -211,4 +312,6 @@ module.exports = {
     generateImageDescription,
     generateImageFromText,
     generateInspiredArt,
+    generateArtFromDescription,
+    regenerateImage,
 };

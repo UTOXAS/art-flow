@@ -1,6 +1,9 @@
 /* Neobrutalism Base */
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Roboto:wght@400;500&display=swap');
 
+/* Arabic Font */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
 :root {
     --soft-white: #F5F5F5;
     --teal: #26A69A;
@@ -16,9 +19,15 @@ body {
     margin: 0;
 }
 
+body[lang="ar"] {
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+}
+
 /* Typography */
 .page-title {
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 2rem;
     font-weight: 700;
     text-align: center;
@@ -27,6 +36,7 @@ body {
 
 h2 {
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1.8rem;
     font-weight: 700;
     margin: 1rem 0;
@@ -34,6 +44,7 @@ h2 {
 
 h3 {
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1.4rem;
     font-weight: 700;
     margin: 1rem 0;
@@ -57,6 +68,7 @@ p, label, pre {
     border: 3px solid var(--charcoal);
     color: var(--dark-gray);
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1rem;
     padding: 0.5rem 1rem;
     margin: 0 0.5rem;
@@ -85,6 +97,7 @@ p, label, pre {
     border: 3px solid var(--charcoal);
     color: var(--dark-gray);
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1rem;
     padding: 0.5rem 1rem;
     width: 100%;
@@ -101,6 +114,11 @@ p, label, pre {
 .btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Language Toggle */
+#languageToggle {
+    max-width: 250px;
 }
 
 /* Loading Overlay */
@@ -129,6 +147,7 @@ p, label, pre {
 .loader-overlay span {
     margin-top: 0.5rem;
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1rem;
     color: var(--dark-gray);
 }
@@ -149,6 +168,7 @@ p, label, pre {
 
 .form-label {
     font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
     font-size: 1rem;
 }
 
