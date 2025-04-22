@@ -1,16 +1,19 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs').promises;
+const fs = require('fs');
 const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage } = require('../services/geminiService');
 
 const router = express.Router();
 
 // Ensure /tmp/uploads exists
-const uploadDir = path.join(__dirname, '../../tmp/uploads');
-fs.mkdir(uploadDir, { recursive: true })
-    .then(() => console.log('Upload directory created successfully:', uploadDir))
-    .catch(err => console.error('Error creating upload directory:', err.message));
+const uploadDir = '/tmp/uploads';
+try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Upload directory created successfully:', uploadDir);
+} catch (err) {
+    console.error('Error creating upload directory:', err.message);
+}
 
 // Configure Multer with sanitized filenames
 const storage = multer.diskStorage({
@@ -18,7 +21,6 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Sanitize filename: keep only alphanumeric, dashes, and extension
         const ext = path.extname(file.originalname).toLowerCase();
         const sanitizedName = file.originalname
             .replace(/[^a-zA-Z0-9]/g, '-') // Replace non-alphanumeric with dashes

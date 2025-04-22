@@ -157,10 +157,6 @@ function setupImageDescription() {
     const resultDiv = document.getElementById('descriptionResult');
     const copyBtn = document.getElementById('copyDescription');
 
-    preview.addEventListener('click', () => {
-        fileInput.click();
-    });
-
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
@@ -168,7 +164,10 @@ function setupImageDescription() {
             resultDiv.textContent = '';
             copyBtn.style.display = 'none';
         }
-        // Do not reset if no file is selected (cancel)
+    });
+
+    preview.addEventListener('click', () => {
+        fileInput.click();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -236,7 +235,7 @@ function setupTextToImage() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = `/Uploads/${data.filename}`;
+                preview.src = `/uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
@@ -277,7 +276,6 @@ function setupImageInspired() {
             downloadBtn.style.display = 'none';
             regenerateBtn.style.display = 'none';
         }
-        // Do not reset if no file is selected (cancel)
     });
 
     preview.addEventListener('click', () => {
@@ -317,7 +315,7 @@ function setupImageInspired() {
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/Uploads/${data.filename}`;
+                    imagePreview.src = `/uploads/${data.filename}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -355,7 +353,7 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/Uploads/${data.filename}`;
+                imagePreview.src = `/uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
@@ -403,7 +401,7 @@ function setupDescriptionToArt() {
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/Uploads/${data.filename}`;
+                    imagePreview.src = `/uploads/${data.filename}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -437,7 +435,7 @@ function setupDescriptionToArt() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/Uploads/${data.filename}`;
+                imagePreview.src = `/uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
