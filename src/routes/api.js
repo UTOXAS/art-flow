@@ -6,14 +6,18 @@ const { generateImageDescription, generateImageFromText, generateInspiredArt, ge
 
 const router = express.Router();
 
-// Ensure tmp directory exists
+// Ensure tmp directory exists in Vercel's writable /tmp directory
 const ensureTmpDir = async () => {
-    const tmpDir = path.join(__dirname, '../../tmp');
+    const tmpDir = '/tmp'; // Use Vercel's writable /tmp directory
     try {
-        await fs.mkdir(tmpDir, { recursive: true });
+        await fs.access(tmpDir); // Check if directory exists
     } catch (error) {
-        console.error('Error creating tmp directory:', error.message, error.stack);
-        throw new Error('Failed to create temporary directory.');
+        try {
+            await fs.mkdir(tmpDir, { recursive: true }); // Attempt to create if it doesn't exist
+        } catch (mkdirError) {
+            console.error('Error creating tmp directory:', mkdirError.message, mkdirError.stack);
+            throw new Error('Failed to create temporary directory.');
+        }
     }
 };
 
@@ -22,7 +26,7 @@ const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
         try {
             await ensureTmpDir();
-            cb(null, path.join(__dirname, '../../tmp'));
+            cb(null, '/tmp'); // Save files to Vercel's /tmp directory
         } catch (error) {
             cb(error);
         }
