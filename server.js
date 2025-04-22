@@ -8,6 +8,11 @@ const port = process.env.PORT || 3000;
 
 // Basic Authentication Middleware
 const auth = (req, res, next) => {
+    // Skip authentication for /uploads
+    if (req.path.startsWith('/uploads')) {
+        return next();
+    }
+
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         res.set('WWW-Authenticate', 'Basic realm="Art Flow"');
@@ -28,19 +33,25 @@ const auth = (req, res, next) => {
     res.status(401).send('Invalid credentials.');
 };
 
-// Apply auth to all routes
-app.use(auth);
-
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'tmp/uploads')));
+
+// Serve uploads directory without authentication
+app.use('/uploads', (req, res, next) => {
+    console.log(`Serving file: ${req.path}`);
+    express.static(path.join(__dirname, 'tmp/uploads'))(req, res, next);
+});
+
+// Apply auth to API routes and other routes
+app.use(auth);
 
 // API Routes
 app.use('/api', apiRoutes);
 
 // Serve index.html for all non-static routes
 app.get('*', (req, res) => {
+    console.log(`Catch-all route hit: ${req.path}`);
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 

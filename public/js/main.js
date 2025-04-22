@@ -37,7 +37,8 @@ const translations = {
         no_prompt: 'يرجى إدخال موجه.',
         no_description: 'يرجى إدخال وصف.',
         error: 'خطأ: ',
-        server_error: 'حدث خطأ في الخادم. حاول مرة أخرى لاحقًا.'
+        server_error: 'حدث خطأ في الخادم. حاول مرة أخرى لاحقًا.',
+        image_load_failed: 'فشل تحميل الصورة. حاول مرة أخرى.'
     },
     en: {
         title: 'Art Flow',
@@ -76,7 +77,8 @@ const translations = {
         no_prompt: 'Please enter a prompt.',
         no_description: 'Please enter a description.',
         error: 'Error: ',
-        server_error: 'A server error occurred. Please try again later.'
+        server_error: 'A server error occurred. Please try again later.',
+        image_load_failed: 'Failed to load the image. Please try again.'
     }
 };
 
@@ -235,7 +237,7 @@ function setupTextToImage() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = `/uploads/${data.filename}`;
+                preview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
@@ -244,6 +246,12 @@ function setupTextToImage() {
         } finally {
             toggleLoading(form, false);
         }
+    });
+
+    preview.addEventListener('error', () => {
+        showAlert('image_load_failed', {}, 'danger');
+        preview.src = '/images/generated-placeholder.png';
+        downloadBtn.style.display = 'none';
     });
 }
 
@@ -315,10 +323,13 @@ function setupImageInspired() {
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}`;
+                    imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
+                } else {
+                    showAlert('image_load_failed', {}, 'warning');
+                    imagePreview.src = '/images/generated-placeholder.png';
                 }
             }
         } catch (err) {
@@ -353,7 +364,7 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}`;
+                imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
@@ -362,6 +373,13 @@ function setupImageInspired() {
         } finally {
             toggleLoading(form, false);
         }
+    });
+
+    imagePreview.addEventListener('error', () => {
+        showAlert('image_load_failed', {}, 'danger');
+        imagePreview.src = '/images/generated-placeholder.png';
+        downloadBtn.style.display = 'none';
+        regenerateBtn.style.display = 'none';
     });
 }
 
@@ -373,7 +391,7 @@ function setupDescriptionToArt() {
     const descriptionInput = document.getElementById('descriptionInput');
     const promptDiv = document.getElementById('artPrompt');
     const imagePreview = document.getElementById('artGeneratedImage');
-    const copyPromptBtn = document.getElementById('copyArtPrompt');
+    const copy耗真金捕鱼官网 copyPromptBtn = document.getElementById('copyArtPrompt');
     const downloadBtn = document.getElementById('downloadArtImage');
     const regenerateBtn = document.getElementById('regenerateArtImage');
     let currentPrompt = '';
@@ -401,7 +419,7 @@ function setupDescriptionToArt() {
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}`;
+                    imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -435,7 +453,7 @@ function setupDescriptionToArt() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}`;
+                imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
@@ -444,6 +462,13 @@ function setupDescriptionToArt() {
         } finally {
             toggleLoading(form, false);
         }
+    });
+
+    imagePreview.addEventListener('error', () => {
+        showAlert('image_load_failed', {}, 'danger');
+        imagePreview.src = '/images/generated-placeholder.png';
+        downloadBtn.style.display = 'none';
+        regenerateBtn.style.display = 'none';
     });
 }
 
