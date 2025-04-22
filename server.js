@@ -6,15 +6,27 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware to set correct MIME types for font files
+app.use((req, res, next) => {
+    if (req.path.endsWith('.woff')) {
+        res.set('Content-Type', 'font/woff');
+    } else if (req.path.endsWith('.woff2')) {
+        res.set('Content-Type', 'font/woff2');
+    }
+    next();
+});
+
 // Basic Authentication Middleware
 const auth = (req, res, next) => {
-    // Skip authentication for static assets and API routes will handle their own auth if needed
+    // Skip authentication for static assets and API routes
     if (
         req.path.startsWith('/css') ||
         req.path.startsWith('/js') ||
         req.path.startsWith('/images') ||
-        req.path.startsWith('/bootstrap')
+        req.path.startsWith('/bootstrap') ||
+        req.path.startsWith('/api')
     ) {
+        console.log(`Serving static asset: ${req.path}`);
         return next();
     }
 
@@ -40,7 +52,16 @@ const auth = (req, res, next) => {
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    // Ensure correct MIME types for fonts
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.woff')) {
+            res.set('Content-Type', 'font/woff');
+        } else if (filePath.endsWith('.woff2')) {
+            res.set('Content-Type', 'font/woff2');
+        }
+    }
+}));
 
 // Apply auth to non-static routes
 app.use(auth);
