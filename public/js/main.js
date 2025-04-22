@@ -126,19 +126,27 @@ function initializeTooltips() {
         });
 
         if (isTouchDevice) {
-            elem.addEventListener('click', () => {
-                tooltip.show();
-                setTimeout(() => {
-                    tooltip.hide();
-                }, 5000);
-            });
-
-            // Dismiss on click outside
-            document.addEventListener('click', (e) => {
-                if (!elem.contains(e.target)) {
+            elem.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event propagation
+                const isVisible = tooltip.tip && tooltip.tip.classList.contains('show');
+                if (!isVisible) {
+                    tooltip.show();
+                } else {
                     tooltip.hide();
                 }
-            }, { once: true });
+
+                // Set up outside click listener to hide tooltip
+                const hideTooltip = (event) => {
+                    if (!elem.contains(event.target) && (!tooltip.tip || !tooltip.tip.contains(event.target))) {
+                        tooltip.hide();
+                        document.removeEventListener('click', hideTooltip);
+                    }
+                };
+
+                if (!isVisible) {
+                    document.addEventListener('click', hideTooltip);
+                }
+            });
         }
     });
 }

@@ -189,11 +189,14 @@ p, label, pre {
 /* Image Previews */
 .img-preview {
     max-height: 300px;
+    max-width: 100%;
     width: auto;
+    height: auto;
     display: block;
     margin: 1rem auto;
     border: 3px solid var(--charcoal);
     box-shadow: 4px 4px var(--coral);
+    box-sizing: border-box;
 }
 
 .img-clickable {
