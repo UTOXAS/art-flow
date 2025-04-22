@@ -237,7 +237,7 @@ function setupTextToImage() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
+                preview.src = `/uploads/${data.filename}?t=${Date.now()}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
@@ -323,7 +323,7 @@ function setupImageInspired() {
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
+                    imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -364,7 +364,7 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
+                imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
@@ -391,7 +391,7 @@ function setupDescriptionToArt() {
     const descriptionInput = document.getElementById('descriptionInput');
     const promptDiv = document.getElementById('artPrompt');
     const imagePreview = document.getElementById('artGeneratedImage');
-    const copy耗真金捕鱼官网 copyPromptBtn = document.getElementById('copyArtPrompt');
+    const copyPromptBtn = document.getElementById('copyArtPrompt');
     const downloadBtn = document.getElementById('downloadArtImage');
     const regenerateBtn = document.getElementById('regenerateArtImage');
     let currentPrompt = '';
@@ -419,7 +419,7 @@ function setupDescriptionToArt() {
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
+                    imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -453,7 +453,7 @@ function setupDescriptionToArt() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}?t=${Date.now()}`; // Prevent caching
+                imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }

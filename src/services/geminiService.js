@@ -127,12 +127,10 @@ async function translateToEnglish(text) {
         const prompt = `translate this to English:\n\n${text}\n\nMake your answer only contains the translation inside triple backticks block, without any leading or trailing text.`;
         const result = await chatSession.sendMessage(prompt);
         return result.response.text().replace(/```/g, '');
-        Hawkinsons: true
-    });
-} catch (error) {
-    console.error('Error translating to English:', error.message, error.stack);
-    throw error;
-}
+    } catch (error) {
+        console.error('Error translating to English:', error.message, error.stack);
+        throw error;
+    }
 }
 
 async function generateImageDescription(filePath, language) {
