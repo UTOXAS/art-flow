@@ -77,15 +77,15 @@ Make your answer only contains the description inside triple backticks block, wi
 `;
 
 const artPromptInstruction = `
-Get inspired by the above description, use your imagination - don't just copy and paste - and artistic abilities and generate a text prompts - don't generate the image - composing a painting artwork.
+Get inspired by the above description, use your imagination - don't just copy and paste - and artistic abilities and generate a text prompt - don't generate the image - composing a painting artwork that follows the same theme, angle, and point of view of the original description.
 The prompt should have its own full standalone context, so who reads it doesn't have to return to any prior descriptions or images.
-By Get inspired I mean don't draw the same image, I mean use it just as a base for imagination. you don't have to follow the original characters, elements and settings closely, you can add, remove, change or tweak as you like maintaining an artistic touch.
+By Get inspired I mean don't draw the same image, I mean use it just as a base for imagination. You can add, remove, change or tweak as you like keeping in mind it should be artistic and follow the same themem angle, and point of view of the original description.
 Things should be emphasized or considered when composing the prompt:
 • The painting is by hand.
 • Should be predominantly realistic with some surreal elements, don't do something totally fantastical and otherworldly.
 • Describe how brushstrokes are used to convey artistic depth.
 • Well-designed characters and elements and symbolism.
-• The prompt should include the name of the style
+• The prompt should include the name of the art style.
 Make your answer only contains the prompt without any leading or trailing text.
 The prompt should begin with the phrase "Generate an image of"
 and the prompt should be in a triple backticks block.
