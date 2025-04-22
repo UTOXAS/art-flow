@@ -80,7 +80,13 @@ async function translateToArabic(text) {
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
         const prompt = `translate this to Arabic:\n\n${text}\n\nMake your answer only contains the translation inside triple backticks block, without any leading or trailing text.`;
         const result = await chatSession.sendMessage(prompt);
-        return result.response.text().replace(/```/g, '');
+        const responseText = result.response.text();
+        const match = responseText.match(/```(.*?)```/s);
+        if (!match || !match[1]) {
+            console.warn('No valid translation found in response:', responseText);
+            throw new Error('Invalid translation response format.');
+        }
+        return match[1].trim();
     } catch (error) {
         console.error('Error translating to Arabic:', error.message, error.stack);
         throw error;
@@ -92,7 +98,13 @@ async function translateToEnglish(text) {
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
         const prompt = `translate this to English:\n\n${text}\n\nMake your answer only contains the translation inside triple backTicks block, without any leading or trailing text.`;
         const result = await chatSession.sendMessage(prompt);
-        return result.response.text().replace(/```/g, '');
+        const responseText = result.response.text();
+        const match = responseText.match(/```(.*?)```/s);
+        if (!match || !match[1]) {
+            console.warn('No valid translation found in response:', responseText);
+            throw new Error('Invalid translation response format.');
+        }
+        return match[1].trim();
     } catch (error) {
         console.error('Error translating to English:', error.message, error.stack);
         throw error;
