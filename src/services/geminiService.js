@@ -106,7 +106,7 @@ async function uploadToGemini(filePath) {
         return uploadResult.file;
     } catch (error) {
         console.error('Error uploading to Gemini:', error.message, error.stack);
-        throw new Error(`Failed to upload file: ${error.message}`);
+        throw new Error(`Failed to upload file to Gemini: ${error.message}`);
     }
 }
 
@@ -214,9 +214,15 @@ async function generateImageFromText(prompt, language) {
 }
 
 async function generateInspiredArt(filePath, additionalInstructions = '', language = 'en') {
+    let fileDeleted = false;
     try {
         // Verify file exists
-        await fs.access(filePath);
+        try {
+            await fs.access(filePath);
+        } catch (error) {
+            throw new Error(`Image file not found at ${filePath}: ${error.message}`);
+        }
+
         const file = await uploadToGemini(filePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
@@ -260,8 +266,9 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
                     console.log('Image uploaded successfully:', url);
                     const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
-                    // Delete uploaded file after all processing
+                    // Delete uploaded file after successful processing
                     await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+                    fileDeleted = true;
                     return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt, url };
                 }
             }
@@ -273,11 +280,14 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
         // Delete uploaded file after processing
         await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        fileDeleted = true;
         return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt };
     } catch (error) {
         console.error('Error generating inspired art:', error.message, error.stack);
-        // Attempt to delete file in case of error
-        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        // Attempt to delete file only if not already deleted
+        if (!fileDeleted) {
+            await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        }
         throw new Error(`Failed to generate inspired art: ${error.message}`);
     }
 }

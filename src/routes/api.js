@@ -1,14 +1,31 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs').promises;
 const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage } = require('../services/geminiService');
 
 const router = express.Router();
 
+// Ensure tmp directory exists
+const ensureTmpDir = async () => {
+    const tmpDir = path.join(__dirname, '../../tmp');
+    try {
+        await fs.mkdir(tmpDir, { recursive: true });
+    } catch (error) {
+        console.error('Error creating tmp directory:', error.message, error.stack);
+        throw new Error('Failed to create temporary directory.');
+    }
+};
+
 // Configure Multer for temporary file storage
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'tmp'); // Temporary directory for uploads
+    destination: async (req, file, cb) => {
+        try {
+            await ensureTmpDir();
+            cb(null, path.join(__dirname, '../../tmp'));
+        } catch (error) {
+            cb(error);
+        }
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
