@@ -8,13 +8,6 @@
     ],
     "routes": [
         {
-            "src": "/uploads/(.*)",
-            "dest": "/tmp/uploads/$1",
-            "headers": {
-                "Cache-Control": "no-cache"
-            }
-        },
-        {
             "src": "/api/(.*)",
             "dest": "server.js"
         },

@@ -8,8 +8,13 @@ const port = process.env.PORT || 3000;
 
 // Basic Authentication Middleware
 const auth = (req, res, next) => {
-    // Skip authentication for /uploads
-    if (req.path.startsWith('/uploads')) {
+    // Skip authentication for static assets and API routes will handle their own auth if needed
+    if (
+        req.path.startsWith('/css') ||
+        req.path.startsWith('/js') ||
+        req.path.startsWith('/images') ||
+        req.path.startsWith('/bootstrap')
+    ) {
         return next();
     }
 
@@ -37,13 +42,7 @@ const auth = (req, res, next) => {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve uploads directory without authentication
-app.use('/uploads', (req, res, next) => {
-    console.log(`Serving file: ${req.path}`);
-    express.static(path.join(__dirname, 'tmp/uploads'))(req, res, next);
-});
-
-// Apply auth to API routes and other routes
+// Apply auth to non-static routes
 app.use(auth);
 
 // API Routes

@@ -1,24 +1,14 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage } = require('../services/geminiService');
 
 const router = express.Router();
 
-// Ensure /tmp/uploads exists
-const uploadDir = '/tmp/uploads';
-try {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log('Upload directory created successfully:', uploadDir);
-} catch (err) {
-    console.error('Error creating upload directory:', err.message);
-}
-
-// Configure Multer with sanitized filenames
+// Configure Multer for temporary file storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadDir);
+        cb(null, 'tmp'); // Temporary directory for uploads
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
@@ -52,8 +42,8 @@ router.post('/text-to-image', async (req, res) => {
         if (!prompt) {
             return res.status(400).json({ error: 'No prompt provided.' });
         }
-        const filename = await generateImageFromText(prompt, language);
-        res.json({ filename });
+        const url = await generateImageFromText(prompt, language);
+        res.json({ url });
     } catch (error) {
         console.error('Error in /text-to-image:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to generate image.' });
@@ -94,8 +84,8 @@ router.post('/regenerate-image', async (req, res) => {
         if (!prompt) {
             return res.status(400).json({ error: 'No prompt provided.' });
         }
-        const filename = await regenerateImage(prompt);
-        res.json({ filename });
+        const url = await regenerateImage(prompt);
+        res.json({ url });
     } catch (error) {
         console.error('Error in /regenerate-image:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to regenerate image.' });

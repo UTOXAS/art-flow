@@ -237,9 +237,9 @@ function setupTextToImage() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = `/uploads/${data.filename}?t=${Date.now()}`;
+                preview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = preview.src;
+                downloadBtn.href = data.url;
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -322,10 +322,10 @@ function setupImageInspired() {
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
-                if (data.filename) {
-                    imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
+                if (data.url) {
+                    imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
-                    downloadBtn.href = imagePreview.src;
+                    downloadBtn.href = data.url;
                     regenerateBtn.style.display = 'block';
                 } else {
                     showAlert('image_load_failed', {}, 'warning');
@@ -364,9 +364,9 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
+                imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = imagePreview.src;
+                downloadBtn.href = data.url;
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -418,10 +418,10 @@ function setupDescriptionToArt() {
                 promptDiv.textContent = data.prompt;
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyPromptBtn.style.display = 'block';
-                if (data.filename) {
-                    imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
+                if (data.url) {
+                    imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
-                    downloadBtn.href = imagePreview.src;
+                    downloadBtn.href = data.url;
                     regenerateBtn.style.display = 'block';
                 }
             }
@@ -453,9 +453,9 @@ function setupDescriptionToArt() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/Uploads/${data.filename}?t=${Date.now()}`;
+                imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = imagePreview.src;
+                downloadBtn.href = data.url;
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');

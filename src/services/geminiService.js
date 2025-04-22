@@ -3,6 +3,7 @@ const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const fs = require('fs').promises;
 const mime = require('mime-types');
 const path = require('path');
+const { put } = require('@vercel/blob');
 require('dotenv').config();
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -109,6 +110,20 @@ async function uploadToGemini(filePath) {
     }
 }
 
+async function uploadImageToVercelBlob(imageBuffer, filename) {
+    try {
+        const { url } = await put(filename, imageBuffer, {
+            access: 'public',
+            contentType: 'image/png',
+        });
+        console.log('Image uploaded to Vercel Blob:', url);
+        return url;
+    } catch (error) {
+        console.error('Error uploading to Vercel Blob:', error.message, error.stack);
+        throw new Error(`Failed to upload image to Vercel Blob: ${error.message}`);
+    }
+}
+
 async function translateToArabic(text) {
     try {
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
@@ -177,7 +192,6 @@ async function generateImageFromText(prompt, language) {
         const result = await chatSession.sendMessage(effectivePrompt);
 
         const filename = `generated-${Date.now()}.png`;
-        const outputPath = path.join('/tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
@@ -187,13 +201,8 @@ async function generateImageFromText(prompt, language) {
                     if (imageBuffer.length === 0) {
                         throw new Error('Empty image data received from Gemini API.');
                     }
-                    await fs.writeFile(outputPath, imageBuffer);
-                    // Verify file is written correctly
-                    const stats = await fs.stat(outputPath);
-                    if (stats.size === 0) {
-                        throw new Error('Written image file is empty.');
-                    }
-                    return filename;
+                    const url = await uploadImageToVercelBlob(imageBuffer, filename);
+                    return url;
                 }
             }
         }
@@ -235,7 +244,6 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         // Step 3: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `inspired-${Date.now()}.png`;
-        const outputPath = path.join('/tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
         const candidates = result.response.candidates;
@@ -248,23 +256,18 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
                     if (imageBuffer.length === 0) {
                         throw new Error('Empty image data received from Gemini API.');
                     }
-                    await fs.writeFile(outputPath, imageBuffer);
-                    // Verify file is written correctly
-                    const stats = await fs.stat(outputPath);
-                    if (stats.size === 0) {
-                        throw new Error('Written image file is empty.');
-                    }
-                    console.log('Image saved successfully:', outputPath);
+                    const url = await uploadImageToVercelBlob(imageBuffer, filename);
+                    console.log('Image uploaded successfully:', url);
                     const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
                     // Delete uploaded file after all processing
                     await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
-                    return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt, filename };
+                    return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt, url };
                 }
             }
         }
 
-        // If no image is generated, return description and prompt without filename
+        // If no image is generated, return description and prompt without url
         console.warn('No image generated for prompt:', artPrompt);
         const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
         const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
@@ -296,7 +299,6 @@ async function generateArtFromDescription(description, language) {
         // Step 2: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `description-art-${Date.now()}.png`;
-        const outputPath = path.join('/tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
         const candidates = result.response.candidates;
@@ -307,14 +309,9 @@ async function generateArtFromDescription(description, language) {
                     if (imageBuffer.length === 0) {
                         throw new Error('Empty image data received from Gemini API.');
                     }
-                    await fs.writeFile(outputPath, imageBuffer);
-                    // Verify file is written correctly
-                    const stats = await fs.stat(outputPath);
-                    if (stats.size === 0) {
-                        throw new Error('Written image file is empty.');
-                    }
+                    const url = await uploadImageToVercelBlob(imageBuffer, filename);
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
-                    return { prompt: displayPrompt, englishPrompt: artPrompt, filename };
+                    return { prompt: displayPrompt, englishPrompt: artPrompt, url };
                 }
             }
         }
@@ -333,7 +330,6 @@ async function regenerateImage(prompt) {
         const result = await chatSession.sendMessage(prompt);
 
         const filename = `regenerated-${Date.now()}.png`;
-        const outputPath = path.join('/tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
@@ -343,14 +339,9 @@ async function regenerateImage(prompt) {
                     if (imageBuffer.length === 0) {
                         throw new Error('Empty image data received from Gemini API.');
                     }
-                    await fs.writeFile(outputPath, imageBuffer);
-                    // Verify file is written correctly
-                    const stats = await fs.stat(outputPath);
-                    if (stats.size === 0) {
-                        throw new Error('Written image file is empty.');
-                    }
-                    console.log('Regenerated image saved successfully:', outputPath);
-                    return filename;
+                    const url = await uploadImageToVercelBlob(imageBuffer, filename);
+                    console.log('Regenerated image uploaded successfully:', url);
+                    return url;
                 }
             }
         }
