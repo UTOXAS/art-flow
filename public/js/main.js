@@ -47,7 +47,7 @@ function showAlert(messageKey, params = {}, type = 'success') {
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     document.body.prepend(alertDiv);
-    setTimeout(() => alertDiv.remove(), 5000);
+    // Removed setTimeout to keep alerts visible until manually closed
 }
 
 // Utility: Copy Text to Clipboard
@@ -98,6 +98,19 @@ function toggleLoading(form, isLoading) {
     loader.style.display = isLoading ? 'flex' : 'none';
 }
 
+// Debounce Utility for Touch Events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // Initialize Bootstrap Tooltips
 function initializeTooltips() {
     const lang = localStorage.getItem('language') || 'ar';
@@ -120,14 +133,16 @@ function initializeTooltips() {
 
         const tooltip = new bootstrap.Tooltip(elem, {
             title: tooltipText,
-            trigger: isTouchDevice ? 'click' : 'hover focus',
+            trigger: isTouchDevice ? 'manual' : 'hover focus',
             placement: 'top',
             customClass: 'custom-tooltip'
         });
 
         if (isTouchDevice) {
-            elem.addEventListener('click', (e) => {
+            const debouncedToggle = debounce((e) => {
+                e.preventDefault();
                 e.stopPropagation(); // Prevent event propagation
+
                 const isVisible = tooltip.tip && tooltip.tip.classList.contains('show');
                 if (!isVisible) {
                     tooltip.show();
@@ -135,18 +150,24 @@ function initializeTooltips() {
                     tooltip.hide();
                 }
 
-                // Set up outside click listener to hide tooltip
+                // Set up outside tap listener to hide tooltip
                 const hideTooltip = (event) => {
+                    // Ignore events on the tooltip element or its tip
                     if (!elem.contains(event.target) && (!tooltip.tip || !tooltip.tip.contains(event.target))) {
                         tooltip.hide();
-                        document.removeEventListener('click', hideTooltip);
+                        document.removeEventListener('touchstart', hideTooltip);
                     }
                 };
 
                 if (!isVisible) {
-                    document.addEventListener('click', hideTooltip);
+                    // Delay adding the listener to avoid immediate closure
+                    setTimeout(() => {
+                        document.addEventListener('touchstart', hideTooltip);
+                    }, 100);
                 }
-            });
+            }, 200);
+
+            elem.addEventListener('touchstart', debouncedToggle);
         }
     });
 }

@@ -30,9 +30,17 @@ const auth = (req, res, next) => {
         return next();
     }
 
+    // Log User-Agent for debugging
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    console.log(`Request for ${req.path} from User-Agent: ${userAgent}`);
+
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         res.set('WWW-Authenticate', 'Basic realm="Art Flow"');
+        // Prevent caching of authentication prompt
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
         return res.status(401).send('Authentication required.');
     }
 
@@ -47,6 +55,9 @@ const auth = (req, res, next) => {
     }
 
     res.set('WWW-Authenticate', 'Basic realm="Art Flow"');
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.status(401).send('Invalid credentials.');
 };
 
