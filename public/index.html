@@ -145,7 +145,7 @@
 
         <!-- Image Inspired Art Section -->
         <section id="image-inspired" class="section">
-            <div class=" varies inspired">
+            <div class="card-neo inspired">
                 <h2 data-translate-key="inspired_art">فن مستوحى</h2>
                 <p class="section-description" data-translate-key="section_inspired_art_info">ارفع صورة وأضف تعليمات
                     اختيارية لإنشاء وصف وموجه فني مستوحى من الصورة. انقر على "إنشاء" للحصول على فن جديد، أو "إعادة
@@ -164,7 +164,7 @@
                     </div>
                     <img id="inspiredImagePreview" class="img-preview img-clickable" src="/images/input-placeholder.png"
                         alt="Preview">
-                    <div class="button-with-tooltip">
+                    <div class="button-with-tooltip" id="generate-inspired-tooltip">
                         <button type="submit" class="btn btn-primary">
                             <span class="btn-text" data-translate-key="generate">إنشاء</span>
                         </button>
@@ -195,8 +195,8 @@
                     <div class="button-group">
                         <button id="downloadInspiredImage" class="btn btn-primary" style="display: none;"
                             data-translate-key="download">تنزيل</button>
-                        <div class="button-with-tooltip">
-                            <button id="regenerateInspiredImage" class="btn btn-primary" style="display: none;">
+                        <div class="button-with-tooltip hidden" id="regenerate-inspired-tooltip">
+                            <button id="regenerateInspiredImage" class="btn btn-primary">
                                 <span data-translate-key="regenerate">إعادة إنشاء</span>
                             </button>
                             <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
@@ -220,7 +220,7 @@
                         <textarea class="form-control" id="descriptionInput" rows="6"
                             placeholder="مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي" required></textarea>
                     </div>
-                    <div class="button-with-tooltip">
+                    <div class="button-with-tooltip" id="generate-art-tooltip">
                         <button type="submit" class="btn btn-primary">
                             <span class="btn-text" data-translate-key="generate">إنشاء</span>
                         </button>
@@ -244,8 +244,8 @@
                     <div class="button-group">
                         <button id="downloadArtImage" class="btn btn-primary" style="display: none;"
                             data-translate-key="download">تنزيل</button>
-                        <div class="button-with-tooltip">
-                            <button id="regenerateArtImage" class="btn btn-primary" style="display: none;">
+                        <div class="button-with-tooltip hidden" id="regenerate-art-tooltip">
+                            <button id="regenerateArtImage" class="btn btn-primary">
                                 <span data-translate-key="regenerate">إعادة إنشاء</span>
                             </button>
                             <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"

@@ -271,10 +271,33 @@ body[lang="ar"] .button-with-tooltip {
     font-size: 1rem;
     cursor: pointer;
     vertical-align: middle;
+    /* Ensure no text content is rendered directly */
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+    text-align: center;
+    /* Prevent any pseudo-elements from displaying text */
+    content: none;
 }
 
 .tooltip-icon:hover {
     color: var(--coral);
+}
+
+/* Custom Tooltip Styling */
+.custom-tooltip .tooltip-inner {
+    background-color: var(--soft-white);
+    color: var(--dark-gray);
+    border: 3px solid var(--charcoal);
+    box-shadow: 4px 4px var(--coral);
+    font-family: 'Space Mono', monospace;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* Ensure button-with-tooltip for regenerate is hidden when button is hidden */
+.button-with-tooltip.hidden {
+    display: none;
 }
 
 /* Footer */

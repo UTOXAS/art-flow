@@ -105,6 +105,9 @@ function initializeTooltips() {
         const key = elem.getAttribute('data-translate-key');
         const tooltipText = translations[lang][key];
 
+        // Set the tooltip title dynamically
+        elem.setAttribute('data-bs-title', tooltipText);
+
         const tooltip = new bootstrap.Tooltip(elem, {
             title: tooltipText,
             trigger: isTouchDevice ? 'click' : 'hover focus',
@@ -250,7 +253,7 @@ function setupImageInspired() {
     const copyDescBtn = document.getElementById('copyInspiredDescription');
     const copyPromptBtn = document.getElementById('copyInspiredPrompt');
     const downloadBtn = document.getElementById('downloadInspiredImage');
-    const regenerateBtn = document.getElementById('regenerateInspiredImage');
+    const regenerateTooltip = document.getElementById('regenerate-inspired-tooltip');
     let currentPrompt = '';
 
     fileInput.addEventListener('change', () => {
@@ -263,7 +266,7 @@ function setupImageInspired() {
             copyDescBtn.style.display = 'none';
             copyPromptBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
-            regenerateBtn.style.display = 'none';
+            regenerateTooltip.classList.add('hidden');
         }
     });
 
@@ -307,7 +310,8 @@ function setupImageInspired() {
                     imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
                     downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
-                    regenerateBtn.style.display = 'block';
+                    regenerateTooltip.classList.remove('hidden');
+                    initializeTooltips(); // Re-initialize tooltips to update text
                 } else {
                     showAlert('image_load_failed', {}, 'warning');
                     imagePreview.src = '/images/generated-placeholder.png';
@@ -328,7 +332,7 @@ function setupImageInspired() {
         copyToClipboard(promptDiv.textContent);
     });
 
-    regenerateBtn.addEventListener('click', async () => {
+    regenerateTooltip.querySelector('#regenerateInspiredImage').addEventListener('click', async () => {
         if (!currentPrompt) {
             showAlert('no_prompt', {}, 'danger');
             return;
@@ -348,6 +352,7 @@ function setupImageInspired() {
                 imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
                 downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
+                regenerateTooltip.classList.remove('hidden');
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -360,7 +365,7 @@ function setupImageInspired() {
         showAlert('image_load_failed', {}, 'danger');
         imagePreview.src = '/images/generated-placeholder.png';
         downloadBtn.style.display = 'none';
-        regenerateBtn.style.display = 'none';
+        regenerateTooltip.classList.add('hidden');
     });
 }
 
@@ -374,7 +379,7 @@ function setupDescriptionToArt() {
     const imagePreview = document.getElementById('artGeneratedImage');
     const copyPromptBtn = document.getElementById('copyArtPrompt');
     const downloadBtn = document.getElementById('downloadArtImage');
-    const regenerateBtn = document.getElementById('regenerateArtImage');
+    const regenerateTooltip = document.getElementById('regenerate-art-tooltip');
     let currentPrompt = '';
 
     form.addEventListener('submit', async (e) => {
@@ -403,7 +408,8 @@ function setupDescriptionToArt() {
                     imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
                     downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
-                    regenerateBtn.style.display = 'block';
+                    regenerateTooltip.classList.remove('hidden');
+                    initializeTooltips(); // Re-initialize tooltips to update text
                 }
             }
         } catch (err) {
@@ -417,7 +423,7 @@ function setupDescriptionToArt() {
         copyToClipboard(promptDiv.textContent);
     });
 
-    regenerateBtn.addEventListener('click', async () => {
+    regenerateTooltip.querySelector('#regenerateArtImage').addEventListener('click', async () => {
         if (!currentPrompt) {
             showAlert('no_prompt', {}, 'danger');
             return;
@@ -437,6 +443,7 @@ function setupDescriptionToArt() {
                 imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
                 downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
+                regenerateTooltip.classList.remove('hidden');
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -449,7 +456,7 @@ function setupDescriptionToArt() {
         showAlert('image_load_failed', {}, 'danger');
         imagePreview.src = '/images/generated-placeholder.png';
         downloadBtn.style.display = 'none';
-        regenerateBtn.style.display = 'none';
+        regenerateTooltip.classList.add('hidden');
     });
 }
 
