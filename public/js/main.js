@@ -157,15 +157,18 @@ function setupImageDescription() {
     const resultDiv = document.getElementById('descriptionResult');
     const copyBtn = document.getElementById('copyDescription');
 
+    preview.addEventListener('click', () => {
+        fileInput.click();
+    });
+
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
             preview.src = URL.createObjectURL(file);
             resultDiv.textContent = '';
             copyBtn.style.display = 'none';
-        } else {
-            preview.src = '/images/input-placeholder.png';
         }
+        // Do not reset if no file is selected (cancel)
     });
 
     form.addEventListener('submit', async (e) => {
@@ -233,7 +236,7 @@ function setupTextToImage() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = `/uploads/${data.filename}`;
+                preview.src = `/Uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = preview.src;
             }
@@ -273,9 +276,8 @@ function setupImageInspired() {
             copyPromptBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
             regenerateBtn.style.display = 'none';
-        } else {
-            preview.src = '/images/input-placeholder.png';
         }
+        // Do not reset if no file is selected (cancel)
     });
 
     preview.addEventListener('click', () => {
@@ -315,7 +317,7 @@ function setupImageInspired() {
                 copyDescBtn.style.display = 'block';
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}`;
+                    imagePreview.src = `/Uploads/${data.filename}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -353,7 +355,7 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}`;
+                imagePreview.src = `/Uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }
@@ -401,7 +403,7 @@ function setupDescriptionToArt() {
                 currentPrompt = data.englishPrompt || data.prompt;
                 copyPromptBtn.style.display = 'block';
                 if (data.filename) {
-                    imagePreview.src = `/uploads/${data.filename}`;
+                    imagePreview.src = `/Uploads/${data.filename}`;
                     downloadBtn.style.display = 'block';
                     downloadBtn.href = imagePreview.src;
                     regenerateBtn.style.display = 'block';
@@ -435,7 +437,7 @@ function setupDescriptionToArt() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = `/uploads/${data.filename}`;
+                imagePreview.src = `/Uploads/${data.filename}`;
                 downloadBtn.style.display = 'block';
                 downloadBtn.href = imagePreview.src;
             }

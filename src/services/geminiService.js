@@ -17,7 +17,7 @@ const descriptionModel = genAI.getGenerativeModel({
     model: 'gemini-2.0-flash-lite',
 });
 const generationModel = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp-image-generation',
+    model: 'gemini-2.5-flash-preview-04-17',
 });
 
 // Configuration for description tasks
@@ -26,7 +26,6 @@ const descriptionConfig = {
     topP: 0.95,
     topK: 40,
     maxOutputTokens: 8192,
-    responseModalities: ['text'],
     responseMimeType: 'text/plain',
 };
 
@@ -36,8 +35,7 @@ const generationConfig = {
     topP: 0.95,
     topK: 40,
     maxOutputTokens: 8192,
-    responseModalities: ['image', 'text'],
-    responseMimeType: 'text/plain',
+    responseMimeType: 'image/png',
 };
 
 const descriptionPrompt = `
@@ -117,7 +115,7 @@ async function translateToArabic(text) {
         return result.response.text().replace(/```/g, '');
     } catch (error) {
         console.error('Error translating to Arabic:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to translate to Arabic: ${error.message}`);
     }
 }
 
@@ -129,7 +127,7 @@ async function translateToEnglish(text) {
         return result.response.text().replace(/```/g, '');
     } catch (error) {
         console.error('Error translating to English:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to translate to English: ${error.message}`);
     }
 }
 
@@ -159,7 +157,7 @@ async function generateImageDescription(filePath, language) {
     } catch (error) {
         console.error('Error generating image description:', error.message, error.stack);
         await fs.unlink(tempFilePath).catch(err => console.warn(`Failed to delete file ${tempFilePath}:`, err.message));
-        throw error;
+        throw new Error(`Failed to generate description: ${error.message}`);
     }
 }
 
@@ -173,22 +171,24 @@ async function generateImageFromText(prompt, language) {
         const chatSession = generationModel.startChat({ generationConfig });
         const result = await chatSession.sendMessage(effectivePrompt);
 
+        console.log('GenerateImageFromText Response:', JSON.stringify(result.response, null, 2));
+
         const filename = `generated-${Date.now()}.png`;
         const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
             for (const part of candidate.content.parts) {
-                if (part.inlineData) {
+                if (part.inlineData && part.inlineData.mimeType === 'image/png') {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
                     return filename;
                 }
             }
         }
-        throw new Error('No image generated.');
+        throw new Error('No image generated in response.');
     } catch (error) {
         console.error('Error generating image from text:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to generate image: ${error.message}`);
     }
 }
 
@@ -225,10 +225,12 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
+        console.log('GenerateInspiredArt Response:', JSON.stringify(result.response, null, 2));
+
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
             for (const part of candidate.content.parts) {
-                if (part.inlineData) {
+                if (part.inlineData && part.inlineData.mimeType === 'image/png') {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
                     const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
@@ -269,10 +271,12 @@ async function generateArtFromDescription(description, language) {
         const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         result = await imageSession.sendMessage(artPrompt);
+        console.log('GenerateArtFromDescription Response:', JSON.stringify(result.response, null, 2));
+
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
             for (const part of candidate.content.parts) {
-                if (part.inlineData) {
+                if (part.inlineData && part.inlineData.mimeType === 'image/png') {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
                     return { prompt: displayPrompt, englishPrompt: artPrompt, filename };
@@ -284,7 +288,7 @@ async function generateArtFromDescription(description, language) {
         return { prompt: displayPrompt, englishPrompt: artPrompt };
     } catch (error) {
         console.error('Error generating art from description:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to generate art: ${error.message}`);
     }
 }
 
@@ -293,22 +297,24 @@ async function regenerateImage(prompt) {
         const chatSession = generationModel.startChat({ generationConfig });
         const result = await chatSession.sendMessage(prompt);
 
+        console.log('RegenerateImage Response:', JSON.stringify(result.response, null, 2));
+
         const filename = `regenerated-${Date.now()}.png`;
         const outputPath = path.join(__dirname, '../../tmp/uploads', filename);
 
         const candidates = result.response.candidates;
         for (const candidate of candidates) {
             for (const part of candidate.content.parts) {
-                if (part.inlineData) {
+                if (part.inlineData && part.inlineData.mimeType === 'image/png') {
                     await fs.writeFile(outputPath, Buffer.from(part.inlineData.data, 'base64'));
                     return filename;
                 }
             }
         }
-        throw new Error('No image generated.');
+        throw new Error('No image generated in response.');
     } catch (error) {
         console.error('Error regenerating image:', error.message, error.stack);
-        throw error;
+        throw new Error(`Failed to regenerate image: ${error.message}`);
     }
 }
 
