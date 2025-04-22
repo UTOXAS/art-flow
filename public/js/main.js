@@ -4,15 +4,25 @@ function setLanguage(lang) {
     localStorage.setItem('language', lang);
     document.documentElement.lang = lang;
     document.body.setAttribute('lang', lang);
-    document.querySelectorAll('[data-translate-key]').forEach(elem => {
+
+    // Update text content for non-tooltip elements
+    document.querySelectorAll('[data-translate-key]:not(.tooltip-icon)').forEach(elem => {
         const key = elem.getAttribute('data-translate-key');
         elem.textContent = translations[lang][key];
     });
+
+    // Update tooltip titles for tooltip-icon elements
+    document.querySelectorAll('.tooltip-icon[data-translate-key]').forEach(elem => {
+        const key = elem.getAttribute('data-translate-key');
+        elem.setAttribute('data-bs-title', translations[lang][key]);
+    });
+
     document.getElementById('languageToggle').textContent = translations[lang][lang === 'ar' ? 'switch_to_english' : 'switch_to_arabic'];
     document.getElementById('textPrompt').placeholder = lang === 'ar' ? 'مثال: شاطئ غروب هادئ' : 'e.g., A serene sunset beach';
     document.getElementById('additionalInstructions').placeholder = lang === 'ar' ? 'مثال: استخدم ألوانًا نابضة بالحياة' : 'e.g., Use vibrant colors';
     document.getElementById('descriptionInput').placeholder = lang === 'ar' ? 'مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي' : 'e.g., A man sitting on a concrete wall at night by a body of water';
-    // Re-initialize tooltips to update text
+
+    // Re-initialize tooltips to apply updated titles
     initializeTooltips();
 }
 
@@ -105,7 +115,7 @@ function initializeTooltips() {
         const key = elem.getAttribute('data-translate-key');
         const tooltipText = translations[lang][key];
 
-        // Set the tooltip title dynamically
+        // Ensure the tooltip title is set
         elem.setAttribute('data-bs-title', tooltipText);
 
         const tooltip = new bootstrap.Tooltip(elem, {
