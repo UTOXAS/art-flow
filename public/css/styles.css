@@ -56,6 +56,16 @@ p, label, pre {
     letter-spacing: 0.02em;
 }
 
+/* Section Descriptions */
+.section-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--dark-gray);
+    margin: 0.5rem 0 1.5rem;
+    max-width: 800px;
+    text-align: center;
+}
+
 /* Navigation Tabs */
 .nav-tabs {
     border-bottom: 3px solid var(--charcoal);
@@ -243,6 +253,32 @@ p, label, pre {
     text-align: center;
 }
 
+/* Tooltip Icon */
+.tooltip-icon {
+    color: var(--charcoal);
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.tooltip-icon:hover {
+    color: var(--coral);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1; /* Ensure footer is not overlaid */
+}
+
+.footer p {
+    margin: 0.25rem 0;
+}
+
 @media (max-width: 576px) {
     .button-group {
         flex-direction: column;
@@ -253,17 +289,6 @@ p, label, pre {
         max-width: 100%;
         margin-bottom: 0.5rem;
     }
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    margin: 2rem 0;
-    font-size: 0.9rem;
-}
-
-.footer p {
-    margin: 0.25rem 0;
 }
 
 /* Responsive Adjustments */
@@ -281,6 +306,10 @@ p, label, pre {
     }
 
     p, label, pre, .btn-nav, .btn-primary {
+        font-size: 0.9rem;
+    }
+
+    .section-description {
         font-size: 0.9rem;
     }
 

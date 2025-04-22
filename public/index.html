@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-translate-key="title">تدفق الفن</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="/images/favicon.ico" type="image/icon">
 </head>
@@ -43,8 +44,9 @@
         <section id="home" class="section active">
             <div class="card-neo">
                 <h2 data-translate-key="create_explore">إنشاء واستكشاف فن الذكاء الاصطناعي</h2>
-                <p data-translate-key="discover_tools">اكتشف أربع أدوات قوية لإطلاق العنان لإبداعك باستخدام الذكاء
-                    الاصطناعي.</p>
+                <p class="section-description" data-translate-key="home_info">مرحبًا بك في تدفق الفن، منصة مدعومة
+                    بالذكاء الاصطناعي لإنشاء واستكشاف الأعمال الفنية. استخدم أدواتنا الأربعة لتحويل الصور والنصوص إلى فن
+                    مذهل، سواء كنت تصف صورة، أو تنشئ فنًا من نص، أو تستلهم من صورة، أو تبني فنًا من وصف.</p>
                 <div class="row">
                     <div class="col-md-3">
                         <div class="card-neo">
@@ -86,6 +88,9 @@
         <section id="image-description" class="section">
             <div class="card-neo">
                 <h2 data-translate-key="describe_image">وصف الصورة</h2>
+                <p class="section-description" data-translate-key="section_describe_info">قم برفع صورة للحصول على وصف
+                    تفصيلي يتضمن الشخصيات، الأشياء، الخلفية، والألوان. انقر على زر "إنشاء" لعرض الوصف، ثم انسخه إذا
+                    رغبت.</p>
                 <form id="imageDescriptionForm">
                     <div class="mb-2">
                         <label for="imageFile" class="form-label" data-translate-key="upload_image">رفع الصورة</label>
@@ -113,6 +118,8 @@
         <section id="text-to-image" class="section">
             <div class="card-neo">
                 <h2 data-translate-key="text_to_art">من النص إلى الفن</h2>
+                <p class="section-description" data-translate-key="section_text_to_art_info">أدخل وصفًا نصيًا لمشهد أو
+                    فكرة، ثم انقر على "إنشاء" لتحويل كلماتك إلى صورة فنية. يمكنك تنزيل الصورة الناتجة.</p>
                 <form id="textToImageForm">
                     <div class="mb-2">
                         <label for="textPrompt" class="form-label" data-translate-key="prompt">الموجه</label>
@@ -130,8 +137,8 @@
                 <div class="output-container">
                     <h3 data-translate-key="art">الفن</h3>
                     <img id="generatedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
-                    <a id="downloadImage" class="btn btn-primary" style="display: none;" download
-                        data-translate-key="download">تنزيل</a>
+                    <button id="downloadImage" class="btn btn-primary" style="display: none;"
+                        data-translate-key="download">تنزيل</button>
                 </div>
             </div>
         </section>
@@ -140,6 +147,9 @@
         <section id="image-inspired" class="section">
             <div class="card-neo">
                 <h2 data-translate-key="inspired_art">فن مستوحى</h2>
+                <p class="section-description" data-translate-key="section_inspired_art_info">ارفع صورة وأضف تعليمات
+                    اختيارية لإنشاء وصف وموجه فني مستوحى من الصورة. انقر على "إنشاء" للحصول على فن جديد، أو "إعادة
+                    إنشاء" لتجربة صورة مختلفة بنفس الموجه.</p>
                 <form id="imageInspiredForm">
                     <div class="mb-2">
                         <label for="inspiredImageFile" class="form-label" data-translate-key="upload_image">رفع
@@ -156,6 +166,8 @@
                         alt="Preview">
                     <button type="submit" class="btn btn-primary">
                         <span class="btn-text" data-translate-key="generate">إنشاء</span>
+                        <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
+                            data-translate-key="generate_tooltip"></span>
                     </button>
                     <div class="loader-overlay" style="display: none;">
                         <div class="loader"></div>
@@ -179,10 +191,13 @@
                     <img id="inspiredGeneratedImage" class="img-preview" src="/images/generated-placeholder.png"
                         alt="Art">
                     <div class="button-group">
-                        <a id="downloadInspiredImage" class="btn btn-primary" style="display: none;" download
-                            data-translate-key="download">تنزيل</a>
-                        <button id="regenerateInspiredImage" class="btn btn-primary" style="display: none;"
-                            data-translate-key="regenerate">إعادة إنشاء</button>
+                        <button id="downloadInspiredImage" class="btn btn-primary" style="display: none;"
+                            data-translate-key="download">تنزيل</button>
+                        <button id="regenerateInspiredImage" class="btn btn-primary" style="display: none;">
+                            <span data-translate-key="regenerate">إعادة إنشاء</span>
+                            <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
+                                data-translate-key="regenerate_tooltip"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -192,6 +207,9 @@
         <section id="description-to-art" class="section">
             <div class="card-neo">
                 <h2 data-translate-key="art_from_description">فن من الوصف</h2>
+                <p class="section-description" data-translate-key="section_art_from_description_info">اكتب وصفًا
+                    تفصيليًا لمشهد أو فكرة، ثم انقر على "إنشاء" لإنتاج موجه فني وصورة. استخدم "إعادة إنشاء" لتجربة صورة
+                    مختلفة بنفس الموجه.</p>
                 <form id="descriptionToArtForm">
                     <div class="mb-2">
                         <label for="descriptionInput" class="form-label" data-translate-key="description">الوصف</label>
@@ -200,6 +218,8 @@
                     </div>
                     <button type="submit" class="btn btn-primary">
                         <span class="btn-text" data-translate-key="generate">إنشاء</span>
+                        <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
+                            data-translate-key="generate_tooltip"></span>
                     </button>
                     <div class="loader-overlay" style="display: none;">
                         <div class="loader"></div>
@@ -216,10 +236,13 @@
                     <h3 data-translate-key="art">الفن</h3>
                     <img id="artGeneratedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
                     <div class="button-group">
-                        <a id="downloadArtImage" class="btn btn-primary" style="display: none;" download
-                            data-translate-key="download">تنزيل</a>
-                        <button id="regenerateArtImage" class="btn btn-primary" style="display: none;"
-                            data-translate-key="regenerate">إعادة إنشاء</button>
+                        <button id="downloadArtImage" class="btn btn-primary" style="display: none;"
+                            data-translate-key="download">تنزيل</button>
+                        <button id="regenerateArtImage" class="btn btn-primary" style="display: none;">
+                            <span data-translate-key="regenerate">إعادة إنشاء</span>
+                            <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
+                                data-translate-key="regenerate_tooltip"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -227,12 +250,13 @@
 
         <footer class="footer">
             <p data-translate-key="powered_by">مدعوم بموديلات جوجل جيميني</p>
-            <p data-translate-key="dedicated_to">مكرس لسهيلة</p>
+            <p data-translate-key="dedicated_to">إهداء إلى سهيلة</p>
             <p data-translate-key="developed_by">طُور بواسطة عبدالله صالح</p>
         </footer>
     </div>
 
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/translations.js"></script>
     <script src="/js/main.js"></script>
 </body>
 

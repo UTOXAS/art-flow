@@ -1,89 +1,6 @@
-// Translation dictionary for Arabic and English
-const translations = {
-    ar: {
-        title: 'تدفق الفن',
-        switch_to_english: 'التبديل إلى الإنجليزية',
-        switch_to_arabic: 'التبديل إلى العربية',
-        home: 'الرئيسية',
-        describe: 'الوصف',
-        text_to_art: 'من النص إلى الفن',
-        inspired_art: 'فن مستوحى',
-        art_from_description: 'فن من الوصف',
-        create_explore: 'إنشاء واستكشاف فن الذكاء الاصطناعي',
-        discover_tools: 'اكتشف أربع أدوات قوية لإطلاق العنان لإبداعك باستخدام الذكاء الاصطناعي.',
-        describe_info: 'احصل على رؤى تفصيلية من صورك.',
-        text_to_art_info: 'حول الكلمات إلى صور بصرية مذهلة.',
-        inspired_art_info: 'أعد مزج الصور إلى أعمال فنية فريدة.',
-        art_from_description_info: 'أنشئ فنًا من وصف نصي.',
-        go: 'اذهب',
-        describe_image: 'وصف الصورة',
-        upload_image: 'رفع الصورة',
-        generate: 'إنشاء',
-        loading: 'جارٍ التحميل...',
-        result: 'النتيجة',
-        copy: 'نسخ',
-        art: 'الفن',
-        download: 'تنزيل',
-        prompt: 'الموجه',
-        notes: 'ملاحظات (اختياري)',
-        description: 'الوصف',
-        regenerate: 'إعادة إنشاء',
-        powered_by: 'مدعوم بموديلات جوجل جيميني',
-        dedicated_to: 'مكرس لسهيلة',
-        published_by: 'طُور بواسطة عبدالله صالح',
-        copied: 'تم النسخ إلى الحافظة!',
-        failed_copy: 'فشل النسخ.',
-        no_image: 'يرجى رفع صورة.',
-        no_prompt: 'يرجى إدخال موجه.',
-        no_description: 'يرجى إدخال وصف.',
-        error: 'خطأ: ',
-        server_error: 'حدث خطأ في الخادم. حاول مرة أخرى لاحقًا.',
-        image_load_failed: 'فشل تحميل الصورة. حاول مرة أخرى.'
-    },
-    en: {
-        title: 'Art Flow',
-        switch_to_english: 'Switch to English',
-        switch_to_arabic: 'Switch to Arabic',
-        home: 'Home',
-        describe: 'Describe',
-        text_to_art: 'Text to Art',
-        inspired_art: 'Inspired Art',
-        art_from_description: 'Art from Description',
-        create_explore: 'Create and Explore AI Art',
-        discover_tools: 'Discover four powerful tools to unleash your creativity with AI.',
-        describe_info: 'Get detailed insights from your images.',
-        text_to_art_info: 'Transform words into stunning visual art.',
-        inspired_art_info: 'Remix images into unique artworks.',
-        art_from_description_info: 'Create art from a textual description.',
-        go: 'Go',
-        describe_image: 'Describe Image',
-        upload_image: 'Upload Image',
-        generate: 'Generate',
-        loading: 'Loading...',
-        result: 'Result',
-        copy: 'Copy',
-        art: 'Art',
-        download: 'Download',
-        prompt: 'Prompt',
-        notes: 'Notes (Optional)',
-        description: 'Description',
-        regenerate: 'Regenerate',
-        powered_by: 'Powered by Google Gemini Models',
-        dedicated_to: 'Dedicated to Suhaila',
-        published_by: 'Developed by Abdullah Saleh',
-        copied: 'Copied to clipboard!',
-        failed_copy: 'Failed to copy.',
-        no_image: 'Please upload an image.',
-        no_prompt: 'Please enter a prompt.',
-        no_description: 'Please enter a description.',
-        error: 'Error: ',
-        server_error: 'A server error occurred. Please try again later.',
-        image_load_failed: 'Failed to load the image. Please try again.'
-    }
-};
-
 // Set language and update UI
 function setLanguage(lang) {
+    console.log('Setting language:', lang); // Debug
     localStorage.setItem('language', lang);
     document.documentElement.lang = lang;
     document.body.setAttribute('lang', lang);
@@ -95,6 +12,8 @@ function setLanguage(lang) {
     document.getElementById('textPrompt').placeholder = lang === 'ar' ? 'مثال: شاطئ غروب هادئ' : 'e.g., A serene sunset beach';
     document.getElementById('additionalInstructions').placeholder = lang === 'ar' ? 'مثال: استخدم ألوانًا نابضة بالحياة' : 'e.g., Use vibrant colors';
     document.getElementById('descriptionInput').placeholder = lang === 'ar' ? 'مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي' : 'e.g., A man sitting on a concrete wall at night by a body of water';
+    // Re-initialize tooltips to update text
+    initializeTooltips();
 }
 
 // Toggle between Arabic and English
@@ -128,8 +47,26 @@ function copyToClipboard(text) {
         .catch(() => showAlert('failed_copy', {}, 'danger'));
 }
 
+// Utility: Download Image
+function downloadImage(url, filename) {
+    fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename || 'art-flow-image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(() => showAlert('image_load_failed', {}, 'danger'));
+}
+
 // Section Management: Toggle Active Section
 function toggleSection(sectionId) {
+    console.log('Toggling section:', sectionId); // Debug
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
     });
@@ -139,6 +76,8 @@ function toggleSection(sectionId) {
         btn.classList.remove('active');
     });
     document.querySelector(`.btn-nav[data-section="${sectionId}"]`).classList.add('active');
+    // Check footer visibility
+    console.log('Footer visible:', document.querySelector('.footer').offsetParent !== null);
 }
 
 // Utility: Toggle Loading State
@@ -147,6 +86,48 @@ function toggleLoading(form, isLoading) {
     const loader = form.querySelector('.loader-overlay');
     submitBtn.disabled = isLoading;
     loader.style.display = isLoading ? 'flex' : 'none';
+}
+
+// Initialize Bootstrap Tooltips
+function initializeTooltips() {
+    const lang = localStorage.getItem('language') || 'ar';
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    // Dispose existing tooltips to prevent duplicates
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(elem => {
+        const tooltipInstance = bootstrap.Tooltip.getInstance(elem);
+        if (tooltipInstance) {
+            tooltipInstance.dispose();
+        }
+    });
+
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(elem => {
+        const key = elem.getAttribute('data-translate-key');
+        const tooltipText = translations[lang][key];
+
+        const tooltip = new bootstrap.Tooltip(elem, {
+            title: tooltipText,
+            trigger: isTouchDevice ? 'click' : 'hover focus',
+            placement: 'top',
+            customClass: 'custom-tooltip'
+        });
+
+        if (isTouchDevice) {
+            elem.addEventListener('click', () => {
+                tooltip.show();
+                setTimeout(() => {
+                    tooltip.hide();
+                }, 5000);
+            });
+
+            // Dismiss on click outside
+            document.addEventListener('click', (e) => {
+                if (!elem.contains(e.target)) {
+                    tooltip.hide();
+                }
+            }, { once: true });
+        }
+    });
 }
 
 // Section 1: Image Description Generator
@@ -239,7 +220,7 @@ function setupTextToImage() {
             } else {
                 preview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = data.url;
+                downloadBtn.onclick = () => downloadImage(data.url, 'text-to-image.png');
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -325,7 +306,7 @@ function setupImageInspired() {
                 if (data.url) {
                     imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
-                    downloadBtn.href = data.url;
+                    downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
                     regenerateBtn.style.display = 'block';
                 } else {
                     showAlert('image_load_failed', {}, 'warning');
@@ -366,7 +347,7 @@ function setupImageInspired() {
             } else {
                 imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = data.url;
+                downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -421,7 +402,7 @@ function setupDescriptionToArt() {
                 if (data.url) {
                     imagePreview.src = data.url;
                     downloadBtn.style.display = 'block';
-                    downloadBtn.href = data.url;
+                    downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
                     regenerateBtn.style.display = 'block';
                 }
             }
@@ -455,7 +436,7 @@ function setupDescriptionToArt() {
             } else {
                 imagePreview.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.href = data.url;
+                downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
             }
         } catch (err) {
             showAlert('server_error', {}, 'danger');
@@ -491,4 +472,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImageInspired();
     setupDescriptionToArt();
     toggleSection('home');
+    initializeTooltips();
 });
