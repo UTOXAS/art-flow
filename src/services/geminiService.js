@@ -4,7 +4,8 @@ const fs = require('fs').promises;
 const mime = require('mime-types');
 const path = require('path');
 const { put } = require('@vercel/blob');
-const { descriptionPrompt, artPromptInstruction } = require('./prompts');
+// MODIFIED: Updated import to include new prompt
+const { descriptionPrompt, photoToPaintingDescriptionPrompt, paintingPromptInstruction } = require('./prompts');
 require('dotenv').config();
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -204,8 +205,8 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
 
         // Step 2: Generate Art Prompt
         const artPromptRequest = additionalInstructions
-            ? `${description}\n\n${additionalInstructions}\n\n${artPromptInstruction}`
-            : `${description}\n\n${artPromptInstruction}`;
+            ? `${description}\n\n${additionalInstructions}\n\n${paintingPromptInstruction}`
+            : `${description}\n\n${paintingPromptInstruction}`;
         result = await chatSession.sendMessage(artPromptRequest);
         const artPrompt = result.response.text().replace(/```/g, '');
         console.log('Generated art prompt:', artPrompt);
@@ -265,7 +266,7 @@ async function generateArtFromDescription(description, language) {
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
         // Step 1: Generate Art Prompt
-        const artPromptRequest = `${effectiveDescription}\n\n${artPromptInstruction}`;
+        const artPromptRequest = `${effectiveDescription}\n\n${paintingPromptInstruction}`;
         let result = await chatSession.sendMessage(artPromptRequest);
         const artPrompt = result.response.text().replace(/```/g, '');
 
@@ -324,10 +325,89 @@ async function regenerateImage(prompt) {
     }
 }
 
+// NEW: Function to generate painting from photo
+async function generatePhotoToPainting(filePath, language = 'en') {
+    let fileDeleted = false;
+    try {
+        // Verify file exists
+        try {
+            await fs.access(filePath);
+        } catch (error) {
+            throw new Error(`Image file not found at ${filePath}: ${error.message}`);
+        }
+
+        const file = await uploadToGemini(filePath);
+        const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
+
+        // Step 1: Generate Detailed Description
+        let result = await chatSession.sendMessage([
+            {
+                fileData: {
+                    mimeType: file.mimeType,
+                    fileUri: file.uri,
+                },
+            },
+            { text: photoToPaintingDescriptionPrompt },
+        ]);
+        let description = result.response.text().replace(/```/g, '');
+        console.log('Generated photo-to-painting description:', description);
+
+        // Step 2: Generate Painting Prompt
+        const paintingPromptRequest = `${description}\n\n${paintingPromptInstruction}`;
+        result = await chatSession.sendMessage(paintingPromptRequest);
+        const paintingPrompt = result.response.text().replace(/```/g, '');
+        console.log('Generated painting prompt:', paintingPrompt);
+
+        // Step 3: Generate Image from Painting Prompt
+        const imageSession = generationModel.startChat({ generationConfig });
+        const filename = `photo-to-painting-${Date.now()}.png`;
+
+        result = await imageSession.sendMessage(paintingPrompt);
+        const candidates = result.response.candidates;
+        console.log('Image generation candidates:', candidates.length);
+
+        for (const candidate of candidates) {
+            for (const part of candidate.content.parts) {
+                if (part.inlineData && part.inlineData.mimeType.startsWith('image/')) {
+                    const imageBuffer = Buffer.from(part.inlineData.data, 'base64');
+                    if (imageBuffer.length === 0) {
+                        throw new Error('Empty image data received from Gemini API.');
+                    }
+                    const url = await uploadImageToVercelBlob(imageBuffer, filename);
+                    console.log('Image uploaded successfully:', url);
+                    const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
+                    const displayPrompt = language === 'ar' ? await translateToArabic(paintingPrompt) : paintingPrompt;
+                    // Delete uploaded file after successful processing
+                    await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+                    fileDeleted = true;
+                    return { description: displayDescription, prompt: displayPrompt, englishPrompt: paintingPrompt, url };
+                }
+            }
+        }
+
+        // If no image is generated, return description and prompt without url
+        console.warn('No image generated for prompt:', paintingPrompt);
+        const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
+        const displayPrompt = language === 'ar' ? await translateToArabic(paintingPrompt) : paintingPrompt;
+        // Delete uploaded file after processing
+        await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        fileDeleted = true;
+        return { description: displayDescription, prompt: displayPrompt, englishPrompt: paintingPrompt };
+    } catch (error) {
+        console.error('Error generating photo-to-painting:', error.message, error.stack);
+        // Attempt to delete file only if not already deleted
+        if (!fileDeleted) {
+            await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
+        }
+        throw new Error(`Failed to generate photo-to-painting: ${error.message}`);
+    }
+}
+
 module.exports = {
     generateImageDescription,
     generateImageFromText,
     generateInspiredArt,
     generateArtFromDescription,
     regenerateImage,
+    generatePhotoToPainting, // NEW: Export new function
 };

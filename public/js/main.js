@@ -21,6 +21,11 @@ function setLanguage(lang) {
     document.getElementById('textPrompt').placeholder = lang === 'ar' ? 'مثال: شاطئ غروب هادئ' : 'e.g., A serene sunset beach';
     document.getElementById('additionalInstructions').placeholder = lang === 'ar' ? 'مثال: استخدم ألوانًا نابضة بالحياة' : 'e.g., Use vibrant colors';
     document.getElementById('descriptionInput').placeholder = lang === 'ar' ? 'مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي' : 'e.g., A man sitting on a concrete wall at night by a body of water';
+    // NEW: Placeholder for photo-to-painting image input
+    const photoToPaintingFileInput = document.getElementById('photoToPaintingImageFile');
+    if (photoToPaintingFileInput) {
+        photoToPaintingFileInput.placeholder = lang === 'ar' ? 'ارفع صورة' : 'Upload an image';
+    }
 
     // Re-initialize tooltips to apply updated titles
     initializeTooltips();
@@ -47,7 +52,6 @@ function showAlert(messageKey, params = {}, type = 'success') {
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     document.body.prepend(alertDiv);
-    // Removed setTimeout to keep alerts visible until manually closed
 }
 
 // Utility: Copy Text to Clipboard
@@ -86,8 +90,6 @@ function toggleSection(sectionId) {
         btn.classList.remove('active');
     });
     document.querySelector(`.btn-nav[data-section="${sectionId}"]`).classList.add('active');
-    // Check footer visibility
-    console.log('Footer visible:', document.querySelector('.footer').offsetParent !== null);
 }
 
 // Utility: Toggle Loading State
@@ -141,7 +143,7 @@ function initializeTooltips() {
         if (isTouchDevice) {
             const debouncedToggle = debounce((e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Prevent event propagation
+                e.stopPropagation();
 
                 const isVisible = tooltip.tip && tooltip.tip.classList.contains('show');
                 if (!isVisible) {
@@ -152,7 +154,6 @@ function initializeTooltips() {
 
                 // Set up outside tap listener to hide tooltip
                 const hideTooltip = (event) => {
-                    // Ignore events on the tooltip element or its tip
                     if (!elem.contains(event.target) && (!tooltip.tip || !tooltip.tip.contains(event.target))) {
                         tooltip.hide();
                         document.removeEventListener('touchstart', hideTooltip);
@@ -160,7 +161,6 @@ function initializeTooltips() {
                 };
 
                 if (!isVisible) {
-                    // Delay adding the listener to avoid immediate closure
                     setTimeout(() => {
                         document.addEventListener('touchstart', hideTooltip);
                     }, 100);
@@ -219,26 +219,23 @@ function setupImageDescription() {
             } else {
                 resultDiv.textContent = data.description;
                 copyBtn.style.display = 'block';
+                copyBtn.onclick = () => copyToClipboard(data.description);
             }
-        } catch (err) {
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
-
-    copyBtn.addEventListener('click', () => {
-        copyToClipboard(resultDiv.textContent);
-    });
 }
 
-// Section 2: Text-to-Image Generator
+// Section 2: Text to Image Generator
 function setupTextToImage() {
     const form = document.getElementById('textToImageForm');
     if (!form) return;
 
     const promptInput = document.getElementById('textPrompt');
-    const preview = document.getElementById('generatedImage');
+    const image = document.getElementById('generatedImage');
     const downloadBtn = document.getElementById('downloadImage');
 
     form.addEventListener('submit', async (e) => {
@@ -254,46 +251,45 @@ function setupTextToImage() {
             const response = await fetch('/api/text-to-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, language: localStorage.getItem('language') || 'ar' }),
+                body: JSON.stringify({
+                    prompt,
+                    language: localStorage.getItem('language') || 'ar'
+                }),
             });
             const data = await response.json();
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                preview.src = data.url;
+                image.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.onclick = () => downloadImage(data.url, 'text-to-image.png');
+                downloadBtn.onclick = () => downloadImage(data.url, 'generated-art.png');
             }
-        } catch (err) {
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
-
-    preview.addEventListener('error', () => {
-        showAlert('image_load_failed', {}, 'danger');
-        preview.src = '/images/generated-placeholder.png';
-        downloadBtn.style.display = 'none';
-    });
 }
 
-// Section 3: Image-Inspired Art Prompt and Image Generator
+// Section 3: Image Inspired Art Generator
 function setupImageInspired() {
     const form = document.getElementById('imageInspiredForm');
     if (!form) return;
 
     const fileInput = document.getElementById('inspiredImageFile');
+    const instructionsInput = document.getElementById('additionalInstructions');
     const preview = document.getElementById('inspiredImagePreview');
-    const additionalInput = document.getElementById('additionalInstructions');
     const descriptionDiv = document.getElementById('inspiredDescription');
     const promptDiv = document.getElementById('inspiredPrompt');
-    const imagePreview = document.getElementById('inspiredGeneratedImage');
-    const copyDescBtn = document.getElementById('copyInspiredDescription');
+    const image = document.getElementById('inspiredGeneratedImage');
+    const copyDescriptionBtn = document.getElementById('copyInspiredDescription');
     const copyPromptBtn = document.getElementById('copyInspiredPrompt');
     const downloadBtn = document.getElementById('downloadInspiredImage');
+    const regenerateBtn = document.getElementById('regenerateInspiredImage');
     const regenerateTooltip = document.getElementById('regenerate-inspired-tooltip');
-    let currentPrompt = '';
+
+    let lastPrompt = '';
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -301,8 +297,8 @@ function setupImageInspired() {
             preview.src = URL.createObjectURL(file);
             descriptionDiv.textContent = '';
             promptDiv.textContent = '';
-            imagePreview.src = '/images/generated-placeholder.png';
-            copyDescBtn.style.display = 'none';
+            image.src = '/images/generated-placeholder.png';
+            copyDescriptionBtn.style.display = 'none';
             copyPromptBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
             regenerateTooltip.classList.add('hidden');
@@ -316,8 +312,6 @@ function setupImageInspired() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const file = fileInput.files[0];
-        const instructions = additionalInput.value.trim();
-
         if (!file) {
             showAlert('no_image', {}, 'danger');
             return;
@@ -326,10 +320,8 @@ function setupImageInspired() {
         toggleLoading(form, true);
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('instructions', instructionsInput.value.trim());
         formData.append('language', localStorage.getItem('language') || 'ar');
-        if (instructions) {
-            formData.append('instructions', instructions);
-        }
 
         try {
             const response = await fetch('/api/image-inspired', {
@@ -340,39 +332,33 @@ function setupImageInspired() {
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                descriptionDiv.textContent = data.description;
-                promptDiv.textContent = data.prompt;
-                currentPrompt = data.englishPrompt || data.prompt;
-                copyDescBtn.style.display = 'block';
-                copyPromptBtn.style.display = 'block';
+                descriptionDiv.textContent = data.description || '';
+                promptDiv.textContent = data.prompt || '';
+                copyDescriptionBtn.style.display = data.description ? 'block' : 'none';
+                copyPromptBtn.style.display = data.prompt ? 'block' : 'none';
+                copyDescriptionBtn.onclick = () => copyToClipboard(data.description);
+                copyPromptBtn.onclick = () => copyToClipboard(data.prompt);
                 if (data.url) {
-                    imagePreview.src = data.url;
+                    image.src = data.url;
                     downloadBtn.style.display = 'block';
                     downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
                     regenerateTooltip.classList.remove('hidden');
-                    initializeTooltips(); // Re-initialize tooltips to update text
+                    lastPrompt = data.englishPrompt || data.prompt;
                 } else {
-                    showAlert('image_load_failed', {}, 'warning');
-                    imagePreview.src = '/images/generated-placeholder.png';
+                    image.src = '/images/generated-placeholder.png';
+                    downloadBtn.style.display = 'none';
+                    regenerateTooltip.classList.add('hidden');
                 }
             }
-        } catch (err) {
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
 
-    copyDescBtn.addEventListener('click', () => {
-        copyToClipboard(descriptionDiv.textContent);
-    });
-
-    copyPromptBtn.addEventListener('click', () => {
-        copyToClipboard(promptDiv.textContent);
-    });
-
-    regenerateTooltip.querySelector('#regenerateInspiredImage').addEventListener('click', async () => {
-        if (!currentPrompt) {
+    regenerateBtn.addEventListener('click', async () => {
+        if (!lastPrompt) {
             showAlert('no_prompt', {}, 'danger');
             return;
         }
@@ -382,44 +368,38 @@ function setupImageInspired() {
             const response = await fetch('/api/regenerate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: currentPrompt }),
+                body: JSON.stringify({ prompt: lastPrompt }),
             });
             const data = await response.json();
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = data.url;
+                image.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.onclick = () => downloadImage(data.url, 'inspired-art.png');
-                regenerateTooltip.classList.remove('hidden');
+                downloadBtn.onclick = () => downloadImage(data.url, 'regenerated-inspired-art.png');
             }
-        } catch (err) {
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
-
-    imagePreview.addEventListener('error', () => {
-        showAlert('image_load_failed', {}, 'danger');
-        imagePreview.src = '/images/generated-placeholder.png';
-        downloadBtn.style.display = 'none';
-        regenerateTooltip.classList.add('hidden');
-    });
 }
 
-// Section 4: Description-to-Art Generator
+// Section 4: Description to Art Generator
 function setupDescriptionToArt() {
     const form = document.getElementById('descriptionToArtForm');
     if (!form) return;
 
     const descriptionInput = document.getElementById('descriptionInput');
     const promptDiv = document.getElementById('artPrompt');
-    const imagePreview = document.getElementById('artGeneratedImage');
+    const image = document.getElementById('artGeneratedImage');
     const copyPromptBtn = document.getElementById('copyArtPrompt');
     const downloadBtn = document.getElementById('downloadArtImage');
+    const regenerateBtn = document.getElementById('regenerateArtImage');
     const regenerateTooltip = document.getElementById('regenerate-art-tooltip');
-    let currentPrompt = '';
+
+    let lastPrompt = '';
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -434,36 +414,39 @@ function setupDescriptionToArt() {
             const response = await fetch('/api/description-to-art', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ description, language: localStorage.getItem('language') || 'ar' }),
+                body: JSON.stringify({
+                    description,
+                    language: localStorage.getItem('language') || 'ar'
+                }),
             });
             const data = await response.json();
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                promptDiv.textContent = data.prompt;
-                currentPrompt = data.englishPrompt || data.prompt;
-                copyPromptBtn.style.display = 'block';
+                promptDiv.textContent = data.prompt || '';
+                copyPromptBtn.style.display = data.prompt ? 'block' : 'none';
+                copyPromptBtn.onclick = () => copyToClipboard(data.prompt);
                 if (data.url) {
-                    imagePreview.src = data.url;
+                    image.src = data.url;
                     downloadBtn.style.display = 'block';
                     downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
                     regenerateTooltip.classList.remove('hidden');
-                    initializeTooltips(); // Re-initialize tooltips to update text
+                    lastPrompt = data.englishPrompt || data.prompt;
+                } else {
+                    image.src = '/images/generated-placeholder.png';
+                    downloadBtn.style.display = 'none';
+                    regenerateTooltip.classList.add('hidden');
                 }
             }
-        } catch (err) {
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
 
-    copyPromptBtn.addEventListener('click', () => {
-        copyToClipboard(promptDiv.textContent);
-    });
-
-    regenerateTooltip.querySelector('#regenerateArtImage').addEventListener('click', async () => {
-        if (!currentPrompt) {
+    regenerateBtn.addEventListener('click', async () => {
+        if (!lastPrompt) {
             showAlert('no_prompt', {}, 'danger');
             return;
         }
@@ -473,43 +456,147 @@ function setupDescriptionToArt() {
             const response = await fetch('/api/regenerate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: currentPrompt }),
+                body: JSON.stringify({ prompt: lastPrompt }),
             });
             const data = await response.json();
             if (data.error) {
                 showAlert('error', { error: data.error }, 'danger');
             } else {
-                imagePreview.src = data.url;
+                image.src = data.url;
                 downloadBtn.style.display = 'block';
-                downloadBtn.onclick = () => downloadImage(data.url, 'description-art.png');
-                regenerateTooltip.classList.remove('hidden');
+                downloadBtn.onclick = () => downloadImage(data.url, 'regenerated-description-art.png');
             }
-        } catch (err) {
+        } catch (error) {
+            showAlert('server_error', {}, 'danger');
+        } finally {
+            toggleLoading(form, false);
+        }
+    });
+}
+
+// NEW: Section 5: Photo to Painting Generator
+function setupPhotoToPainting() {
+    const form = document.getElementById('photoToPaintingForm');
+    if (!form) return;
+
+    const fileInput = document.getElementById('photoToPaintingImageFile');
+    const preview = document.getElementById('photoToPaintingImagePreview');
+    const descriptionDiv = document.getElementById('photoToPaintingDescription');
+    const promptDiv = document.getElementById('photoToPaintingPrompt');
+    const image = document.getElementById('photoToPaintingGeneratedImage');
+    const copyDescriptionBtn = document.getElementById('copyPhotoToPaintingDescription');
+    const copyPromptBtn = document.getElementById('copyPhotoToPaintingPrompt');
+    const downloadBtn = document.getElementById('downloadPhotoToPaintingImage');
+    const regenerateBtn = document.getElementById('regeneratePhotoToPaintingImage');
+    const regenerateTooltip = document.getElementById('regenerate-photo-to-painting-tooltip');
+
+    let lastPrompt = '';
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            descriptionDiv.textContent = '';
+            promptDiv.textContent = '';
+            image.src = '/images/generated-placeholder.png';
+            copyDescriptionBtn.style.display = 'none';
+            copyPromptBtn.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            regenerateTooltip.classList.add('hidden');
+        }
+    });
+
+    preview.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        if (!file) {
+            showAlert('no_image', {}, 'danger');
+            return;
+        }
+
+        toggleLoading(form, true);
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('language', localStorage.getItem('language') || 'ar');
+
+        try {
+            const response = await fetch('/api/photo-to-painting', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            if (data.error) {
+                showAlert('error', { error: data.error }, 'danger');
+            } else {
+                descriptionDiv.textContent = data.description || '';
+                promptDiv.textContent = data.prompt || '';
+                copyDescriptionBtn.style.display = data.description ? 'block' : 'none';
+                copyPromptBtn.style.display = data.prompt ? 'block' : 'none';
+                copyDescriptionBtn.onclick = () => copyToClipboard(data.description);
+                copyPromptBtn.onclick = () => copyToClipboard(data.prompt);
+                if (data.url) {
+                    image.src = data.url;
+                    downloadBtn.style.display = 'block';
+                    downloadBtn.onclick = () => downloadImage(data.url, 'photo-to-painting.png');
+                    regenerateTooltip.classList.remove('hidden');
+                    lastPrompt = data.englishPrompt || data.prompt;
+                } else {
+                    image.src = '/images/generated-placeholder.png';
+                    downloadBtn.style.display = 'none';
+                    regenerateTooltip.classList.add('hidden');
+                }
+            }
+        } catch (error) {
             showAlert('server_error', {}, 'danger');
         } finally {
             toggleLoading(form, false);
         }
     });
 
-    imagePreview.addEventListener('error', () => {
-        showAlert('image_load_failed', {}, 'danger');
-        imagePreview.src = '/images/generated-placeholder.png';
-        downloadBtn.style.display = 'none';
-        regenerateTooltip.classList.add('hidden');
+    regenerateBtn.addEventListener('click', async () => {
+        if (!lastPrompt) {
+            showAlert('no_prompt', {}, 'danger');
+            return;
+        }
+
+        toggleLoading(form, true);
+        try {
+            const response = await fetch('/api/regenerate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: lastPrompt }),
+            });
+            const data = await response.json();
+            if (data.error) {
+                showAlert('error', { error: data.error }, 'danger');
+            } else {
+                image.src = data.url;
+                downloadBtn.style.display = 'block';
+                downloadBtn.onclick = () => downloadImage(data.url, 'regenerated-photo-to-painting.png');
+            }
+        } catch (error) {
+            showAlert('server_error', {}, 'danger');
+        } finally {
+            toggleLoading(form, false);
+        }
     });
 }
 
 // Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
     const savedLang = localStorage.getItem('language') || 'ar';
     setLanguage(savedLang);
 
     document.getElementById('languageToggle').addEventListener('click', toggleLanguage);
 
-    document.querySelectorAll('.btn-nav, .btn-primary[data-section]').forEach(btn => {
+    document.querySelectorAll('.btn-nav, .btn[data-section]').forEach(btn => {
         btn.addEventListener('click', () => {
-            const section = btn.getAttribute('data-section');
-            if (section) toggleSection(section);
+            const sectionId = btn.getAttribute('data-section');
+            toggleSection(sectionId);
         });
     });
 
@@ -517,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTextToImage();
     setupImageInspired();
     setupDescriptionToArt();
-    toggleSection('home');
-    initializeTooltips();
-});
+    setupPhotoToPainting(); // NEW: Initialize photo-to-painting section
+}
+
+document.addEventListener('DOMContentLoaded', init);

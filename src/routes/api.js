@@ -2,7 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
-const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage } = require('../services/geminiService');
+// MODIFIED: Added new import
+const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage, generatePhotoToPainting } = require('../services/geminiService');
 
 const router = express.Router();
 
@@ -110,6 +111,21 @@ router.post('/regenerate-image', async (req, res) => {
     } catch (error) {
         console.error('Error in /regenerate-image:', error.message, error.stack);
         res.status(500).json({ error: 'Failed to regenerate image.' });
+    }
+});
+
+// NEW: Endpoint for photo-to-painting
+router.post('/photo-to-painting', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No image uploaded.' });
+        }
+        const language = req.body.language || 'en';
+        const result = await generatePhotoToPainting(req.file.path, language);
+        res.json(result);
+    } catch (error) {
+        console.error('Error in /photo-to-painting:', error.message, error.stack);
+        res.status(500).json({ error: `Failed to generate photo-to-painting: ${error.message}` });
     }
 });
 

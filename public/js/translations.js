@@ -8,6 +8,10 @@ const translations = {
         text_to_art: 'من النص إلى الفن',
         inspired_art: 'فن مستوحى',
         art_from_description: 'فن من الوصف',
+        // NEW: Photo to Painting translations
+        photo_to_painting: 'من الصورة إلى اللوحة',
+        photo_to_painting_info: 'حول صورك إلى لوحات فنية مرسومة يدويًا.',
+        section_photo_to_painting_info: 'ارفع صورة لإنشاء وصف تفصيلي وموجه فني للوحة مرسومة يدويًا. انقر على "إنشاء" لإنتاج اللوحة، أو "إعادة إنشاء" لتجربة لوحة مختلفة بنفس الموجه.',
         create_explore: 'إنشاء واستكشاف فن الذكاء الاصطناعي',
         home_info: 'مرحبًا بك في تدفق الفن، منصة مدعومة بالذكاء الاصطناعي لإنشاء واستكشاف الأعمال الفنية. استخدم أدواتنا الأربعة لتحويل الصور والنصوص إلى فن مذهل، سواء كنت تصف صورة، أو تنشئ فنًا من نص، أو تستلهم من صورة، أو تبني فنًا من وصف.',
         discover_tools: 'اكتشف أربع أدوات قوية لإطلاق العنان لإبداعك باستخدام الذكاء الاصطناعي.',
@@ -55,6 +59,10 @@ const translations = {
         text_to_art: 'Text to Art',
         inspired_art: 'Inspired Art',
         art_from_description: 'Art from Description',
+        // NEW: Photo to Painting translations
+        photo_to_painting: 'Photo to Painting',
+        photo_to_painting_info: 'Transform your photos into hand-painted artworks.',
+        section_photo_to_painting_info: 'Upload a photo to generate a detailed description and a painting prompt for a hand-painted artwork. Click "Generate" to produce the painting, or "Regenerate" to try a different painting with the same prompt.',
         create_explore: 'Create and Explore AI Art',
         home_info: 'Welcome to Art Flow, an AI-powered platform for creating and exploring artworks. Use our four tools to transform images and text into stunning art, whether describing an image, generating art from text, remixing an image, or crafting art from a description.',
         discover_tools: 'Discover four powerful tools to unleash your creativity with AI.',

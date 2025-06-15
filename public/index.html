@@ -38,6 +38,11 @@
                 <button class="nav-link btn-nav" data-section="description-to-art"
                     data-translate-key="art_from_description">فن من الوصف</button>
             </li>
+            <!-- NEW: Photo to Painting navigation tab -->
+            <li class="nav-item">
+                <button class="nav-link btn-nav" data-section="photo-to-painting"
+                    data-translate-key="photo_to_painting">من الصورة إلى اللوحة</button>
+            </li>
         </ul>
 
         <!-- Home Section -->
@@ -77,6 +82,15 @@
                             <h3 data-translate-key="art_from_description">فن من الوصف</h3>
                             <p data-translate-key="art_from_description_info">أنشئ فنًا من وصف نصي.</p>
                             <button class="btn btn-primary" data-section="description-to-art"
+                                data-translate-key="go">اذهب</button>
+                        </div>
+                    </div>
+                    <!-- NEW: Photo to Painting card in home section -->
+                    <div class="col-md-3">
+                        <div class="card-neo">
+                            <h3 data-translate-key="photo_to_painting">من الصورة إلى اللوحة</h3>
+                            <p data-translate-key="photo_to_painting_info">حول صورك إلى لوحات فنية مرسومة يدويًا.</p>
+                            <button class="btn btn-primary" data-section="photo-to-painting"
                                 data-translate-key="go">اذهب</button>
                         </div>
                     </div>
@@ -250,6 +264,54 @@
                             </button>
                             <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip"
                                 data-translate-key="regenerate_tooltip"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Photo to Painting Section -->
+        <section id="photo-to-painting" class="section">
+            <div class="card-neo">
+                <h2 data-translate-key="photo_to_painting">من الصورة إلى اللوحة</h2>
+                <p class="section-description" data-translate-key="section_photo_to_painting_info">ارفع صورة لإنشاء وصف تفصيلي وموجه فني للوحة مرسومة يدويًا. انقر على "إنشاء" لإنتاج اللوحة، أو "إعادة إنشاء" لتجربة لوحة مختلفة بنفس الموجه.</p>
+                <form id="photoToPaintingForm">
+                    <div class="mb-2">
+                        <label for="photoToPaintingImageFile" class="form-label" data-translate-key="upload_image">رفع الصورة</label>
+                        <input type="file" class="form-control" id="photoToPaintingImageFile" accept="image/*" required>
+                    </div>
+                    <img id="photoToPaintingImagePreview" class="img-preview img-clickable" src="/images/input-placeholder.png" alt="Preview">
+                    <div class="button-with-tooltip" id="generate-photo-to-painting-tooltip">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text" data-translate-key="generate">إنشاء</span>
+                        </button>
+                        <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip" data-translate-key="generate_tooltip"></span>
+                    </div>
+                    <div class="loader-overlay" style="display: none;">
+                        <div class="loader"></div>
+                        <span data-translate-key="loading">جارٍ التحميل...</span>
+                    </div>
+                </form>
+                <div class="output-container">
+                    <h3 data-translate-key="description">الوصف</h3>
+                    <pre id="photoToPaintingDescription" class="output-text"></pre>
+                    <button id="copyPhotoToPaintingDescription" class="btn btn-primary" style="display: none;" data-translate-key="copy">نسخ</button>
+                </div>
+                <div class="output-container">
+                    <h3 data-translate-key="prompt">الموجه</h3>
+                    <pre id="photoToPaintingPrompt" class="output-text"></pre>
+                    <button id="copyPhotoToPaintingPrompt" class="btn btn-primary" style="display: none;" data-translate-key="copy">نسخ</button>
+                </div>
+                <div class="output-container">
+                    <h3 data-translate-key="art">الفن</h3>
+                    <img id="photoToPaintingGeneratedImage" class="img-preview" src="/images/generated-placeholder.png" alt="Art">
+                    <div class="button-group">
+                        <button id="downloadPhotoToPaintingImage" class="btn btn-primary" style="display: none;" data-translate-key="download">تنزيل</button>
+                        <div class="button-with-tooltip hidden" id="regenerate-photo-to-painting-tooltip">
+                            <button id="regeneratePhotoToPaintingImage" class="btn btn-primary">
+                                <span data-translate-key="regenerate">إعادة إنشاء</span>
+                            </button>
+                            <span class="tooltip-icon bi bi-exclamation-circle" data-bs-toggle="tooltip" data-translate-key="regenerate_tooltip"></span>
                         </div>
                     </div>
                 </div>
