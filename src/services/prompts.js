@@ -1,40 +1,5 @@
+// MODIFIED: Replaced with new comprehensive description prompt
 const descriptionPrompt = `
-Please provide a detailed description of the image you see below, including the following:
-
-Characters:
-Number of characters
-Gender, age, and ethnicity of each character
-Clothing and accessories
-Facial expressions and body language
-Positions of characters relative to each other and to the background
-Objects:
-Types of objects
-Sizes and shapes of objects
-Positions of objects relative to each other and to the background
-Background:
-Setting (indoor or outdoor, specific location)
-Colors and textures
-Lighting and shadows
-Point of View (POV):
-Angle and distance from which the image is taken
-Colors:
-Dominant colors and color scheme
-Use of color to create mood or atmosphere
-Spacing:
-Use of empty space to create balance and composition
-Shades:
-Use of light and shadow to create depth and dimension
-Style:
-Overall style of the image (e.g., realistic, abstract, impressionistic)
-Sizes:
-Relative sizes of characters and objects
-Positions:
-Precise placement of characters and objects within the frame
-Make your answer only contains the description inside triple backticks block, without any leading or trailing text.
-`;
-
-// NEW: Prompt for detailed photo-to-painting description
-const photoToPaintingDescriptionPrompt = `
 Please provide a comprehensive and accurate description of the image, detailing the following aspects:
 
 ### Characters
@@ -66,7 +31,6 @@ Please provide a comprehensive and accurate description of the image, detailing 
 Make your answer only contains the description inside triple backticks markdown block, without any leading or trailing text.
 `;
 
-// MODIFIED: Renamed for clarity and consistency
 const paintingPromptInstruction = `
 Get inspired by the above description, use your imagination - don't just copy and paste - and artistic abilities and generate a text prompt - don't generate the image - composing a painting artwork that follows the same theme, angle, and point of view of the original description.
 The prompt should have its own full standalone context, so who reads it doesn't have to return to any prior descriptions or images.
@@ -82,8 +46,26 @@ The prompt should begin with the phrase "Generate an image of"
 and the prompt should be in a triple backticks block.
 `;
 
+// NEW: Prompt instruction for photo-to-painting section
+const photoToPaintingPromptInstruction = `
+I need you to generate a detailed text prompt for a painting, based on the above description. Your output should only be the text prompt, presented within a Markdown block.
+
+The core goal is for the generated prompt to be fully self-contained, meaning anyone reading it should understand the desired artwork without needing any prior context or external references.
+
+Please ensure the text prompt adheres to the following criteria:
+
+Artistic and Evocative Language: Employ rich, descriptive language that conveys an artistic sensibility, suitable for inspiring a painting.
+Theme, Angle, and Point of View Consistency: The prompt must clearly establish and consistently maintain the overarching theme, visual angle, and specific point of view as if it were derived from a real painting. your prompt should read as it naturally flowed from the original description.
+Emphasis on Hand-Painted Quality: Explicitly convey that the painting is created by hand.
+Brushstroke Detail: Describe how the brushstrokes are utilized to achieve artistic depth, texture, and emotional resonance within the painting. This is a crucial element to emphasize.
+Prompt Structure:
+The prompt must begin with the exact phrase: "Generate an image of".
+The entire prompt must be enclosed within a Markdown block.
+Your response should contain only the generated text prompt in the specified format, without any additional leading or trailing text or commentary.
+`;
+
 module.exports = {
-    descriptionPrompt,
-    photoToPaintingDescriptionPrompt, // NEW: Export new prompt
-    paintingPromptInstruction, // MODIFIED: Updated export name
+    descriptionPrompt, // MODIFIED: Updated prompt
+    paintingPromptInstruction,
+    photoToPaintingPromptInstruction, // NEW: Export new prompt
 };

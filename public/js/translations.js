@@ -8,7 +8,6 @@ const translations = {
         text_to_art: 'من النص إلى الفن',
         inspired_art: 'فن مستوحى',
         art_from_description: 'فن من الوصف',
-        // NEW: Photo to Painting translations
         photo_to_painting: 'من الصورة إلى اللوحة',
         photo_to_painting_info: 'حول صورك إلى لوحات فنية مرسومة يدويًا.',
         section_photo_to_painting_info: 'ارفع صورة لإنشاء وصف تفصيلي وموجه فني للوحة مرسومة يدويًا. انقر على "إنشاء" لإنتاج اللوحة، أو "إعادة إنشاء" لتجربة لوحة مختلفة بنفس الموجه.',
@@ -59,7 +58,6 @@ const translations = {
         text_to_art: 'Text to Art',
         inspired_art: 'Inspired Art',
         art_from_description: 'Art from Description',
-        // NEW: Photo to Painting translations
         photo_to_painting: 'Photo to Painting',
         photo_to_painting_info: 'Transform your photos into hand-painted artworks.',
         section_photo_to_painting_info: 'Upload a photo to generate a detailed description and a painting prompt for a hand-painted artwork. Click "Generate" to produce the painting, or "Regenerate" to try a different painting with the same prompt.',

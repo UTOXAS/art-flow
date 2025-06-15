@@ -2,19 +2,17 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
-// MODIFIED: Added new import
 const { generateImageDescription, generateImageFromText, generateInspiredArt, generateArtFromDescription, regenerateImage, generatePhotoToPainting } = require('../services/geminiService');
 
 const router = express.Router();
 
-// Ensure tmp directory exists in Vercel's writable /tmp directory
 const ensureTmpDir = async () => {
-    const tmpDir = '/tmp'; // Use Vercel's writable /tmp directory
+    const tmpDir = '/tmp';
     try {
-        await fs.access(tmpDir); // Check if directory exists
+        await fs.access(tmpDir);
     } catch (error) {
         try {
-            await fs.mkdir(tmpDir, { recursive: true }); // Attempt to create if it doesn't exist
+            await fs.mkdir(tmpDir, { recursive: true });
         } catch (mkdirError) {
             console.error('Error creating tmp directory:', mkdirError.message, mkdirError.stack);
             throw new Error('Failed to create temporary directory.');
@@ -22,12 +20,11 @@ const ensureTmpDir = async () => {
     }
 };
 
-// Configure Multer for temporary file storage
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
         try {
             await ensureTmpDir();
-            cb(null, '/tmp'); // Save files to Vercel's /tmp directory
+            cb(null, '/tmp');
         } catch (error) {
             cb(error);
         }
@@ -35,15 +32,14 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
         const sanitizedName = file.originalname
-            .replace(/[^a-zA-Z0-9]/g, '-') // Replace non-alphanumeric with dashes
-            .replace(/-+/g, '-') // Collapse multiple dashes
+            .replace(/[^a-zA-Z0-9]/g, '-')
+            .replace(/-+/g, '-')
             .toLowerCase();
         cb(null, `${Date.now()}-${sanitizedName}${ext}`);
     },
 });
 const upload = multer({ storage });
 
-// API Endpoints
 router.post('/image-description', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
@@ -114,7 +110,6 @@ router.post('/regenerate-image', async (req, res) => {
     }
 });
 
-// NEW: Endpoint for photo-to-painting
 router.post('/photo-to-painting', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {

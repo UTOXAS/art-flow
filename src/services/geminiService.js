@@ -4,8 +4,8 @@ const fs = require('fs').promises;
 const mime = require('mime-types');
 const path = require('path');
 const { put } = require('@vercel/blob');
-// MODIFIED: Updated import to include new prompt
-const { descriptionPrompt, photoToPaintingDescriptionPrompt, paintingPromptInstruction } = require('./prompts');
+// MODIFIED: Updated import to include photoToPaintingPromptInstruction
+const { descriptionPrompt, paintingPromptInstruction, photoToPaintingPromptInstruction } = require('./prompts');
 require('dotenv').config();
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -45,7 +45,6 @@ const generationConfig = {
 
 async function uploadToGemini(filePath) {
     try {
-        // Verify file exists
         await fs.access(filePath);
         const mimeType = mime.lookup(filePath);
         if (!mimeType) {
@@ -114,7 +113,6 @@ async function translateToEnglish(text) {
 
 async function generateImageDescription(filePath, language) {
     try {
-        // Verify file exists
         await fs.access(filePath);
         const file = await uploadToGemini(filePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
@@ -134,12 +132,10 @@ async function generateImageDescription(filePath, language) {
             description = await translateToArabic(description);
         }
 
-        // Delete file after processing
         await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         return description;
     } catch (error) {
         console.error('Error generating image description:', error.message, error.stack);
-        // Attempt to delete file in case of error
         await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         throw error;
     }
@@ -180,7 +176,6 @@ async function generateImageFromText(prompt, language) {
 async function generateInspiredArt(filePath, additionalInstructions = '', language = 'en') {
     let fileDeleted = false;
     try {
-        // Verify file exists
         try {
             await fs.access(filePath);
         } catch (error) {
@@ -190,7 +185,6 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         const file = await uploadToGemini(filePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
-        // Step 1: Generate Description
         let result = await chatSession.sendMessage([
             {
                 fileData: {
@@ -203,7 +197,6 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         let description = result.response.text().replace(/```/g, '');
         console.log('Generated description:', description);
 
-        // Step 2: Generate Art Prompt
         const artPromptRequest = additionalInstructions
             ? `${description}\n\n${additionalInstructions}\n\n${paintingPromptInstruction}`
             : `${description}\n\n${paintingPromptInstruction}`;
@@ -211,7 +204,6 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
         const artPrompt = result.response.text().replace(/```/g, '');
         console.log('Generated art prompt:', artPrompt);
 
-        // Step 3: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `inspired-${Date.now()}.png`;
 
@@ -230,7 +222,6 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
                     console.log('Image uploaded successfully:', url);
                     const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
                     const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
-                    // Delete uploaded file after successful processing
                     await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
                     fileDeleted = true;
                     return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt, url };
@@ -238,17 +229,14 @@ async function generateInspiredArt(filePath, additionalInstructions = '', langua
             }
         }
 
-        // If no image is generated, return description and prompt without url
         console.warn('No image generated for prompt:', artPrompt);
         const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
         const displayPrompt = language === 'ar' ? await translateToArabic(artPrompt) : artPrompt;
-        // Delete uploaded file after processing
         await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         fileDeleted = true;
         return { description: displayDescription, prompt: displayPrompt, englishPrompt: artPrompt };
     } catch (error) {
         console.error('Error generating inspired art:', error.message, error.stack);
-        // Attempt to delete file only if not already deleted
         if (!fileDeleted) {
             await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         }
@@ -265,12 +253,10 @@ async function generateArtFromDescription(description, language) {
 
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
-        // Step 1: Generate Art Prompt
         const artPromptRequest = `${effectiveDescription}\n\n${paintingPromptInstruction}`;
         let result = await chatSession.sendMessage(artPromptRequest);
         const artPrompt = result.response.text().replace(/```/g, '');
 
-        // Step 2: Generate Image from Art Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `description-art-${Date.now()}.png`;
 
@@ -325,11 +311,9 @@ async function regenerateImage(prompt) {
     }
 }
 
-// NEW: Function to generate painting from photo
 async function generatePhotoToPainting(filePath, language = 'en') {
     let fileDeleted = false;
     try {
-        // Verify file exists
         try {
             await fs.access(filePath);
         } catch (error) {
@@ -339,7 +323,7 @@ async function generatePhotoToPainting(filePath, language = 'en') {
         const file = await uploadToGemini(filePath);
         const chatSession = descriptionModel.startChat({ generationConfig: descriptionConfig });
 
-        // Step 1: Generate Detailed Description
+        // MODIFIED: Use descriptionPrompt instead of photoToPaintingDescriptionPrompt
         let result = await chatSession.sendMessage([
             {
                 fileData: {
@@ -347,18 +331,17 @@ async function generatePhotoToPainting(filePath, language = 'en') {
                     fileUri: file.uri,
                 },
             },
-            { text: photoToPaintingDescriptionPrompt },
+            { text: descriptionPrompt },
         ]);
         let description = result.response.text().replace(/```/g, '');
         console.log('Generated photo-to-painting description:', description);
 
-        // Step 2: Generate Painting Prompt
-        const paintingPromptRequest = `${description}\n\n${paintingPromptInstruction}`;
+        // MODIFIED: Use photoToPaintingPromptInstruction
+        const paintingPromptRequest = `${description}\n\n${photoToPaintingPromptInstruction}`;
         result = await chatSession.sendMessage(paintingPromptRequest);
         const paintingPrompt = result.response.text().replace(/```/g, '');
         console.log('Generated painting prompt:', paintingPrompt);
 
-        // Step 3: Generate Image from Painting Prompt
         const imageSession = generationModel.startChat({ generationConfig });
         const filename = `photo-to-painting-${Date.now()}.png`;
 
@@ -377,7 +360,6 @@ async function generatePhotoToPainting(filePath, language = 'en') {
                     console.log('Image uploaded successfully:', url);
                     const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
                     const displayPrompt = language === 'ar' ? await translateToArabic(paintingPrompt) : paintingPrompt;
-                    // Delete uploaded file after successful processing
                     await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
                     fileDeleted = true;
                     return { description: displayDescription, prompt: displayPrompt, englishPrompt: paintingPrompt, url };
@@ -385,17 +367,14 @@ async function generatePhotoToPainting(filePath, language = 'en') {
             }
         }
 
-        // If no image is generated, return description and prompt without url
         console.warn('No image generated for prompt:', paintingPrompt);
         const displayDescription = language === 'ar' ? await translateToArabic(description) : description;
         const displayPrompt = language === 'ar' ? await translateToArabic(paintingPrompt) : paintingPrompt;
-        // Delete uploaded file after processing
         await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         fileDeleted = true;
         return { description: displayDescription, prompt: displayPrompt, englishPrompt: paintingPrompt };
     } catch (error) {
         console.error('Error generating photo-to-painting:', error.message, error.stack);
-        // Attempt to delete file only if not already deleted
         if (!fileDeleted) {
             await fs.unlink(filePath).catch(err => console.warn(`Failed to delete file ${filePath}:`, err.message));
         }
@@ -409,5 +388,5 @@ module.exports = {
     generateInspiredArt,
     generateArtFromDescription,
     regenerateImage,
-    generatePhotoToPainting, // NEW: Export new function
+    generatePhotoToPainting,
 };

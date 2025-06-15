@@ -21,11 +21,6 @@ function setLanguage(lang) {
     document.getElementById('textPrompt').placeholder = lang === 'ar' ? 'مثال: شاطئ غروب هادئ' : 'e.g., A serene sunset beach';
     document.getElementById('additionalInstructions').placeholder = lang === 'ar' ? 'مثال: استخدم ألوانًا نابضة بالحياة' : 'e.g., Use vibrant colors';
     document.getElementById('descriptionInput').placeholder = lang === 'ar' ? 'مثال: رجل يجلس على جدار خرساني ليلاً بجوار مسطح مائي' : 'e.g., A man sitting on a concrete wall at night by a body of water';
-    // NEW: Placeholder for photo-to-painting image input
-    const photoToPaintingFileInput = document.getElementById('photoToPaintingImageFile');
-    if (photoToPaintingFileInput) {
-        photoToPaintingFileInput.placeholder = lang === 'ar' ? 'ارفع صورة' : 'Upload an image';
-    }
 
     // Re-initialize tooltips to apply updated titles
     initializeTooltips();
@@ -118,7 +113,6 @@ function initializeTooltips() {
     const lang = localStorage.getItem('language') || 'ar';
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    // Dispose existing tooltips to prevent duplicates
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(elem => {
         const tooltipInstance = bootstrap.Tooltip.getInstance(elem);
         if (tooltipInstance) {
@@ -130,7 +124,6 @@ function initializeTooltips() {
         const key = elem.getAttribute('data-translate-key');
         const tooltipText = translations[lang][key];
 
-        // Ensure the tooltip title is set
         elem.setAttribute('data-bs-title', tooltipText);
 
         const tooltip = new bootstrap.Tooltip(elem, {
@@ -152,7 +145,6 @@ function initializeTooltips() {
                     tooltip.hide();
                 }
 
-                // Set up outside tap listener to hide tooltip
                 const hideTooltip = (event) => {
                     if (!elem.contains(event.target) && (!tooltip.tip || !tooltip.tip.contains(event.target))) {
                         tooltip.hide();
@@ -474,7 +466,7 @@ function setupDescriptionToArt() {
     });
 }
 
-// NEW: Section 5: Photo to Painting Generator
+// Section 5: Photo to Painting Generator
 function setupPhotoToPainting() {
     const form = document.getElementById('photoToPaintingForm');
     if (!form) return;
@@ -604,7 +596,7 @@ function init() {
     setupTextToImage();
     setupImageInspired();
     setupDescriptionToArt();
-    setupPhotoToPainting(); // NEW: Initialize photo-to-painting section
+    setupPhotoToPainting();
 }
 
 document.addEventListener('DOMContentLoaded', init);
